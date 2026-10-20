@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MechaLingua HMI v3.0 - Clean Interactive Dashboard & Multi-Variation ESP</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome CDN for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        industrial: {
+                            950: '#070a12',
+                            900: '#0b0f19',
+                            800: '#111827',
+                            700: '#1f2937',
+                            accent: '#f59e0b',
+                            danger: '#ef4444',
+                            normal: '#10b981'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .font-mono-tech { font-family: 'JetBrains Mono', monospace; }
+        .blink-warning { animation: blinker 1.2s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0.35; } }
+        .fade-in { animation: fadeIn 0.25s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #111827; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
+    </style>
+</head>
+<body class="bg-industrial-950 text-gray-100 min-h-screen flex flex-col">
+
+    <!-- Top Navigation / Clean HMI Header -->
+    <header class="bg-industrial-800/90 backdrop-blur border-b border-gray-800 px-6 py-3.5 sticky top-0 z-30 flex flex-wrap justify-between items-center shadow-md">
+        <div class="flex items-center space-x-3">
+            <div class="bg-amber-500 text-gray-950 p-2 rounded-lg font-bold text-lg flex items-center justify-center shadow">
+                <i class="fa-solid fa-gears"></i>
+            </div>
+            <div>
+                <h1 class="text-base sm:text-lg font-bold tracking-wider uppercase text-white flex items-center gap-2">
+                    MechaLingua <span class="text-[11px] bg-amber-500/20 text-amber-400 border border-amber-500/40 px-2 py-0.5 rounded font-mono-tech">HMI v3.0</span>
+                </h1>
+                <p class="text-[11px] text-gray-400">Clean Progressive Dashboard &amp; Multi-Variation Technical English Simulator</p>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-3 mt-2 sm:mt-0">
+            <div id="system-status-badge" class="flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 px-3 py-1.5 rounded-full text-xs font-mono-tech font-semibold">
+                <span id="status-dot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span id="status-text">SYSTEM STANDBY // NORMAL</span>
+            </div>
+            <button onclick="resetToStandby()" class="bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 border border-gray-700">
+                <i class="fa-solid fa-power-off text-emerald-400"></i> Standby / Reset
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 p-4 sm:p-6 max-w-6xl w-full mx-auto flex flex-col gap-5">
+
+        <!-- STEP 1: COMPACT SCENARIO SELECTOR BAR (Always Visible) -->
+        <section class="bg-industrial-800 border border-gray-800 rounded-xl p-4 shadow-lg">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                <h2 class="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders"></i> Langkah 1: Pilih Simulasi Sensor Kerusakan Mesin (Fault Trigger)
+                </h2>
+                <span class="text-[11px] text-gray-400">Klik salah satu tombol di bawah untuk memunculkan simulasi &amp; modul bahasa</span>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                <button onclick="selectScenario('thermal')" id="btn-thermal" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700/80 transition flex items-center gap-2.5 group">
+                    <div class="w-8 h-8 rounded bg-red-500/15 text-red-400 flex items-center justify-center shrink-0 group-hover:bg-red-500 group-hover:text-white transition">
+                        <i class="fa-solid fa-temperature-high text-sm"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <div class="text-xs font-bold text-white truncate">1. Thermal Overload</div>
+                        <div class="text-[10px] text-gray-400 truncate">Panas Berlebih Poros</div>
+                    </div>
+                </button>
+
+                <button onclick="selectScenario('lube_oil')" id="btn-lube_oil" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700/80 transition flex items-center gap-2.5 group">
+                    <div class="w-8 h-8 rounded bg-yellow-500/15 text-yellow-400 flex items-center justify-center shrink-0 group-hover:bg-yellow-500 group-hover:text-gray-950 transition">
+                        <i class="fa-solid fa-oil-can text-sm"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <div class="text-xs font-bold text-white truncate">2. Low Lube Oil</div>
+                        <div class="text-[10px] text-gray-400 truncate">Oli Gearbox Rendah</div>
+                    </div>
+                </button>
+
+                <button onclick="selectScenario('hydraulic')" id="btn-hydraulic" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700/80 transition flex items-center gap-2.5 group">
+                    <div class="w-8 h-8 rounded bg-blue-500/15 text-blue-400 flex items-center justify-center shrink-0 group-hover:bg-blue-500 group-hover:text-white transition">
+                        <i class="fa-solid fa-gauge-high text-sm"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <div class="text-xs font-bold text-white truncate">3. Hydraulic Drop</div>
+                        <div class="text-[10px] text-gray-400 truncate">Tekanan Hidrolik Turun</div>
+                    </div>
+                </button>
+
+                <button onclick="selectScenario('pneumatic')" id="btn-pneumatic" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700/80 transition flex items-center gap-2.5 group">
+                    <div class="w-8 h-8 rounded bg-cyan-500/15 text-cyan-400 flex items-center justify-center shrink-0 group-hover:bg-cyan-500 group-hover:text-gray-950 transition">
+                        <i class="fa-solid fa-wind text-sm"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <div class="text-xs font-bold text-white truncate">4. Pneumatic Loss</div>
+                        <div class="text-[10px] text-gray-400 truncate">Angin Kompresor Bocor</div>
+                    </div>
+                </button>
+
+                <button onclick="selectScenario('jamming')" id="btn-jamming" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700/80 transition flex items-center gap-2.5 group">
+                    <div class="w-8 h-8 rounded bg-amber-500/15 text-amber-400 flex items-center justify-center shrink-0 group-hover:bg-amber-500 group-hover:text-gray-950 transition">
+                        <i class="fa-solid fa-screwdriver-wrench text-sm"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <div class="text-xs font-bold text-white truncate">5. Mech. Jamming</div>
+                        <div class="text-[10px] text-gray-400 truncate">Konveyor Macet</div>
+                    </div>
+                </button>
+
+                <button onclick="selectScenario('vibration')" id="btn-vibration" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700/80 transition flex items-center gap-2.5 group">
+                    <div class="w-8 h-8 rounded bg-purple-500/15 text-purple-400 flex items-center justify-center shrink-0 group-hover:bg-purple-500 group-hover:text-white transition">
+                        <i class="fa-solid fa-wave-square text-sm"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <div class="text-xs font-bold text-white truncate">6. Bearing Wear</div>
+                        <div class="text-[10px] text-gray-400 truncate">Laher Spindel Aus</div>
+                    </div>
+                </button>
+
+                <button onclick="selectScenario('coolant')" id="btn-coolant" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700/80 transition flex items-center gap-2.5 group">
+                    <div class="w-8 h-8 rounded bg-teal-500/15 text-teal-400 flex items-center justify-center shrink-0 group-hover:bg-teal-500 group-hover:text-gray-950 transition">
+                        <i class="fa-solid fa-faucet-drip text-sm"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <div class="text-xs font-bold text-white truncate">7. Coolant Blockage</div>
+                        <div class="text-[10px] text-gray-400 truncate">Air Pendingin Mampet</div>
+                    </div>
+                </button>
+
+                <button onclick="selectScenario('misalignment')" id="btn-misalignment" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700/80 transition flex items-center gap-2.5 group">
+                    <div class="w-8 h-8 rounded bg-pink-500/15 text-pink-400 flex items-center justify-center shrink-0 group-hover:bg-pink-500 group-hover:text-white transition">
+                        <i class="fa-solid fa-arrows-left-right-to-line text-sm"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <div class="text-xs font-bold text-white truncate">8. Misalignment</div>
+                        <div class="text-[10px] text-gray-400 truncate">Poros Tidak Senter</div>
+                    </div>
+                </button>
+            </div>
+        </section>
+
+        <!-- STANDBY PLACEHOLDER -->
+        <section id="standby-screen" class="flex-1 bg-industrial-800/50 border-2 border-dashed border-gray-800 rounded-2xl p-10 flex flex-col items-center justify-center text-center min-h-[380px] fade-in">
+            <div class="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-2xl mb-4 shadow-inner">
+                <i class="fa-solid fa-desktop"></i>
+            </div>
+            <h2 class="text-lg font-bold text-white mb-1">Mesin Beroperasi Normal (Standby Mode)</h2>
+            <p class="text-xs text-gray-400 max-w-md leading-relaxed mb-6">
+                Dashboard disembunyikan agar tampilan bersih. Silakan <strong>klik salah satu dari 8 tombol skenario kerusakan di atas</strong> untuk memulai simulasi.
+            </p>
+        </section>
+
+        <!-- ACTIVE WORKSPACE -->
+        <div id="active-workspace" class="hidden flex-col gap-5 fade-in">
+            <section class="bg-black border-2 border-gray-800 rounded-xl p-5 shadow-2xl">
+                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-800 pb-3.5 mb-4">
+                    <div class="flex items-center space-x-2">
+                        <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                        <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                        <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                        <span class="text-xs font-mono-tech text-gray-400 ml-2">HMI_DIAGNOSTIC_DISPLAY</span>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-1.5 bg-industrial-900 p-1 rounded-lg border border-gray-800">
+                        <span class="text-[11px] text-gray-400 px-2 font-medium">Variasi Kalimat:</span>
+                        <button onclick="switchVariation(0)" id="var-btn-0" class="var-btn text-xs px-2.5 py-1 rounded font-mono-tech font-semibold transition">V1: HMI</button>
+                        <button onclick="switchVariation(1)" id="var-btn-1" class="var-btn text-xs px-2.5 py-1 rounded font-mono-tech font-semibold transition">V2: Manual</button>
+                        <button onclick="switchVariation(2)" id="var-btn-2" class="var-btn text-xs px-2.5 py-1 rounded font-mono-tech font-semibold transition">V3: SOP</button>
+                    </div>
+                </div>
+
+                <div class="font-mono-tech p-4 rounded-lg bg-red-500/10 border border-red-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="space-y-1.5">
+                        <div class="flex flex-wrap items-center gap-2 text-xs font-bold text-amber-400">
+                            <i class="fa-solid fa-triangle-exclamation blink-warning text-red-400"></i>
+                            <span id="fault-code-id">FAULT CODE: ERR-THM-01</span>
+                            <span id="var-style-badge" class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded">Gaya 1</span>
+                        </div>
+                        <div id="fault-english-text" class="text-base sm:text-xl font-bold text-white tracking-wide leading-snug"></div>
+                    </div>
+                    <button onclick="speakCurrentFault()" class="shrink-0 bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold text-xs px-4 py-2.5 rounded-lg flex items-center justify-center gap-2 transition shadow-lg">
+                        <i class="fa-solid fa-volume-high"></i> Suara (TTS)
+                    </button>
+                </div>
+
+                <div class="mt-5 pt-4 border-t border-gray-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <span class="text-xs text-gray-400 font-medium">Pilih modul penjelasan:</span>
+                    <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
+                        <button onclick="openModule('translation')" id="tab-translation" class="mod-tab text-xs font-semibold px-3.5 py-2 rounded-lg border border-gray-700 bg-industrial-800 hover:bg-gray-700 text-gray-200 transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-language text-emerald-400"></i> 1. Terjemahan
+                        </button>
+                        <button onclick="openModule('grammar')" id="tab-grammar" class="mod-tab text-xs font-semibold px-3.5 py-2 rounded-lg border border-gray-700 bg-industrial-800 hover:bg-gray-700 text-gray-200 transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-sitemap text-blue-400"></i> 2. Grammar
+                        </button>
+                        <button onclick="openModule('vocab')" id="tab-vocab" class="mod-tab text-xs font-semibold px-3.5 py-2 rounded-lg border border-gray-700 bg-industrial-800 hover:bg-gray-700 text-gray-200 transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-spell-check text-amber-400"></i> 3. Kosakata
+                        </button>
+                        <button onclick="openModule('telemetry')" id="tab-telemetry" class="mod-tab text-xs font-semibold px-3.5 py-2 rounded-lg border border-gray-700 bg-industrial-800 hover:bg-gray-700 text-gray-200 transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-chart-line text-red-400"></i> 4. Grafik IoT
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <div id="module-prompt" class="bg-industrial-800/40 border border-gray-800 rounded-xl p-6 text-center text-xs text-gray-400 fade-in">
+                <i class="fa-solid fa-circle-info text-amber-400 mr-1"></i> Klik salah satu <strong>tombol modul di atas</strong> untuk menampilkan materi penjelasannya.
+            </div>
+
+            <!-- MODULE 1 -->
+            <section id="panel-translation" class="mod-panel hidden bg-industrial-800 border border-gray-700 rounded-xl p-5 shadow-lg fade-in">
+                <div class="flex items-center justify-between border-b border-gray-700 pb-3 mb-4">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-emerald-400">Modul 1: Terjemahan Teknis &amp; SOP Bengkel</h3>
+                    <button onclick="closeModules()" class="text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i> Tutup</button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-emerald-950/30 border border-emerald-600/40 rounded-lg p-4">
+                        <div class="text-xs font-bold uppercase text-emerald-400 mb-1.5">Terjemahan Baku</div>
+                        <p id="trans-technical" class="text-sm font-semibold text-white leading-relaxed"></p>
+                    </div>
+                    <div class="bg-industrial-900 border border-gray-700 rounded-lg p-4">
+                        <div class="text-xs font-bold uppercase text-amber-400 mb-1.5">Istilah Bengkel &amp; SOP</div>
+                        <p id="trans-local-sop" class="text-xs text-gray-300 leading-relaxed"></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MODULE 2 -->
+            <section id="panel-grammar" class="mod-panel hidden bg-industrial-800 border border-gray-700 rounded-xl p-5 shadow-lg fade-in">
+                <div class="flex items-center justify-between border-b border-gray-700 pb-3 mb-4">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-blue-400">Modul 2: Bedah Grammar (Passive Voice &amp; ESP)</h3>
+                    <button onclick="closeModules()" class="text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i> Tutup</button>
+                </div>
+                <div id="grammar-cards" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </section>
+
+            <!-- MODULE 3 -->
+            <section id="panel-vocab" class="mod-panel hidden bg-industrial-800 border border-gray-700 rounded-xl p-5 shadow-lg fade-in">
+                <div class="flex items-center justify-between border-b border-gray-700 pb-3 mb-4">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-amber-400">Modul 3: Kosakata &amp; Sinonim Mesin</h3>
+                    <button onclick="closeModules()" class="text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i> Tutup</button>
+                </div>
+                <div class="overflow-x-auto rounded-lg border border-gray-700 mb-5">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-industrial-900 text-[11px] uppercase text-gray-400 border-b border-gray-700">
+                                <th class="py-2.5 px-3">Kata</th>
+                                <th class="py-2.5 px-3">Kelas</th>
+                                <th class="py-2.5 px-3">Arti</th>
+                                <th class="py-2.5 px-3">Sinonim</th>
+                                <th class="py-2.5 px-3 text-center">Suara</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vocab-table-body" class="divide-y divide-gray-800 text-xs bg-industrial-900/40"></tbody>
+                    </table>
+                </div>
+                <div class="bg-industrial-900 border border-gray-700 rounded-lg p-4">
+                    <div class="text-xs font-bold uppercase text-amber-400 mb-2.5">Perbandingan 3 Variasi Kalimat:</div>
+                    <div id="all-variations-list" class="space-y-2 text-xs"></div>
+                </div>
+            </section>
+
+            <!-- MODULE 4 -->
+            <section id="panel-telemetry" class="mod-panel hidden bg-industrial-800 border border-gray-700 rounded-xl p-5 shadow-lg fade-in">
+                <div class="flex items-center justify-between border-b border-gray-700 pb-3 mb-4">
+                    <div>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-red-400">Modul 4: Grafik Sensor IoT (Real-Time)</h3>
+                        <p id="chart-subtitle" class="text-xs text-gray-400 mt-0.5">Sensor Telemetry</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span id="telemetry-live-val" class="text-xs font-mono-tech font-bold px-2.5 py-1 rounded bg-red-950 text-red-400 border border-red-700"></span>
+                        <button onclick="closeModules()" class="text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i> Tutup</button>
+                    </div>
+                </div>
+                <div class="relative w-full h-56 bg-industrial-900/60 p-3 rounded-lg border border-gray-800">
+                    <canvas id="telemetryChart"></canvas>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="bg-industrial-900 border-t border-gray-800 py-3 px-6 text-center text-xs text-gray-500 mt-auto">
+        MechaLingua HMI v3.0 - ESP Mechanical Engineering Simulator
+    </footer>
+
+    <script>
+        const faultDatabase = {
+            thermal: {
+                code: "ERR-THM-01", sensorName: "Primary Drive Shaft Temperature (°C)", shortMetric: "Shaft Temp", safeLimit: "< 85 °C", unit: "°C", normalBase: 55, faultSpike: 118,
+                localSop: "<strong>Bahasa Bengkel:</strong> As utama <em>overheat</em>.<br><strong>SOP:</strong> Kurangi beban putaran, cek *cooling fan*.",
+                variations: [
+                    { label: "V1: HMI", englishText: "WARNING: Critical Thermal Overload Detected on Primary Drive Shaft.", translation: "Peringatan: Beban Panas Berlebih Kritis Terdeteksi pada Poros Utama.", grammarPoints: [{ term: "Detected", type: "Reduced Passive", desc: "Pasif ringkas untuk layar HMI." }] },
+                    { label: "V2: Manual", englishText: "ALARM: Excessive Heat Has Been Generated in the Main Motor Spindle.", translation: "Alarm: Panas Berlebih Telah Dihasilkan di Spindel Utama.", grammarPoints: [{ term: "Has Been Generated", type: "Present Perfect Passive", desc: "Menyatakan suhu yang telah timbul." }] },
+                    { label: "V3: SOP", englishText: "DANGER: Overheating is Observed on Rotor Axle. Machine Must Be Cooled Down.", translation: "Bahaya: Pemanasan Teramati pada Poros Rotor. Mesin Harus Didinginkan.", grammarPoints: [{ term: "Must Be Cooled Down", type: "Modal Passive", desc: "Instruksi wajib." }] }
+                ],
+                vocabList: [{ word: "Thermal Overload", pos: "Compound Noun", meaning: "Panas berlebih", synonyms: "Excessive Heat" }]
+            },
+            lube_oil: {
+                code: "ERR-LUB-02", sensorName: "Gearbox Oil Sump Level (%)", shortMetric: "Oil Level", safeLimit: "60 - 100 %", unit: "%", normalBase: 82, faultSpike: 12,
+                localSop: "<strong>Bahasa Bengkel:</strong> Oli gearbox tekor.<br><strong>SOP:</strong> Cek *sight glass*, tambah oli SAE standar.",
+                variations: [
+                    { label: "V1: HMI", englishText: "WARNING: Critically Low Lubrication Oil Level is Detected in Gearbox Sump. Lubricant Must Be Refilled.", translation: "Peringatan: Level Oli Rendah Terdeteksi di Gearbox. Pelumas Harus Diisi Ulang.", grammarPoints: [{ term: "is Detected", type: "Present Passive", desc: "Fakta sensor saat ini." }] },
+                    { label: "V2: Manual", englishText: "FAULT: Gearbox Lubricant Has Been Depleted Below Minimum Threshold.", translation: "Kesalahan: Pelumas Gearbox Telah Terkuras di Bawah Batas Minimum.", grammarPoints: [{ term: "Has Been Depleted", type: "Present Perfect Passive", desc: "Telah menyusut habis." }] },
+                    { label: "V3: SOP", englishText: "ALARM: Insufficient Oil Volume is Sensed in Transmission Reservoir. Top Up Oil Immediately.", translation: "Alarm: Volume Oli Kurang. Tambahkan Segera.", grammarPoints: [{ term: "Top Up", type: "Imperative Phrasal", desc: "Perintah tambah oli." }] }
+                ],
+                vocabList: [{ word: "Lubrication Oil", pos: "Compound Noun", meaning: "Oli pelumas", synonyms: "Lubricant" }]
+            },
+            hydraulic: {
+                code: "ERR-HYD-03", sensorName: "Hydraulic Line Pressure (Bar)", shortMetric: "Hyd. Pressure", safeLimit: "120 - 160 Bar", unit: "Bar", normalBase: 145, faultSpike: 32,
+                localSop: "<strong>Bahasa Bengkel:</strong> Tekanan oli hidrolik ngedrop.<br><strong>SOP:</strong> Cek kebocoran selang.",
+                variations: [
+                    { label: "V1: HMI", englishText: "FAULT: Insufficient Hydraulic Pressure is Detected in Main Actuator Valve. System Operation is Suspended.", translation: "Kesalahan: Tekanan Hidrolik Kurang Terdeteksi. Sistem Ditangguhkan.", grammarPoints: [{ term: "is Suspended", type: "Present Passive", desc: "Dihentikan sementara." }] },
+                    { label: "V2: Manual", englishText: "WARNING: Sudden Pressure Drop Was Recorded in Hydraulic Manifold.", translation: "Peringatan: Penurunan Tekanan Tercatat di Manifold.", grammarPoints: [{ term: "Was Recorded", type: "Past Passive", desc: "Terekam log." }] },
+                    { label: "V3: SOP", englishText: "ALARM: Substandard Fluid Pressure Has Been Identified. Pump Must Be Inspected.", translation: "Alarm: Tekanan Di Bawah Standar Teridentifikasi. Pompa Harus Diperiksa.", grammarPoints: [{ term: "Must Be Inspected", type: "Modal Passive", desc: "Wajib dicek." }] }
+                ],
+                vocabList: [{ word: "Pressure Drop", pos: "Compound Noun", meaning: "Penurunan tekanan", synonyms: "Pressure Loss" }]
+            },
+            pneumatic: {
+                code: "ERR-PNE-04", sensorName: "Pneumatic Air Supply (Bar)", shortMetric: "Air Pressure", safeLimit: "6 - 8 Bar", unit: "Bar", normalBase: 6.8, faultSpike: 1.4,
+                localSop: "<strong>Bahasa Bengkel:</strong> Angin kompresor bocor.<br><strong>SOP:</strong> Cek selang PU.",
+                variations: [
+                    { label: "V1: HMI", englishText: "ALARM: Compressed Air Pressure Was Lost in Pneumatic Cylinder. Emergency Brake is Being Engaged.", translation: "Alarm: Tekanan Angin Hilang. Rem Darurat Mengaktifkan Diri.", grammarPoints: [{ term: "is Being Engaged", type: "Continuous Passive", desc: "Sedang dikaitkan." }] },
+                    { label: "V2: Manual", englishText: "FAULT: Pneumatic Supply Line Has Been Depressurized Due to Air Leakage.", translation: "Kesalahan: Jalur Pneumatik Kehilangan Tekanan Akibat Kebocoran.", grammarPoints: [{ term: "Has Been Depressurized", type: "Present Perfect Passive", desc: "Kehilangan tekanan." }] },
+                    { label: "V3: SOP", englishText: "WARNING: Inadequate Air Pressure is Detected at Solenoid Valve.", translation: "Peringatan: Tekanan Tidak Memadai Terdeteksi.", grammarPoints: [{ term: "Inadequate", type: "Negative Prefix", desc: "Kurang dari standar." }] }
+                ],
+                vocabList: [{ word: "Compressed Air", pos: "Adj + Noun", meaning: "Udara bertekanan", synonyms: "Pneumatic Air" }]
+            },
+            jamming: {
+                code: "ERR-MEC-05", sensorName: "Motor Torque Load (%)", shortMetric: "Motor Torque", safeLimit: "< 90 %", unit: "%", normalBase: 48, faultSpike: 148,
+                localSop: "<strong>Bahasa Bengkel:</strong> Konveyor macet nyangkut.<br><strong>SOP:</strong> Bersihkan material ganjalan.",
+                variations: [
+                    { label: "V1: HMI", englishText: "ALERT: Secondary Conveyor Belt Has Been Stopped Automatically Due to Mechanical Jamming.", translation: "Peringatan: Konveyor Dihentikan Otomatis karena Macet.", grammarPoints: [{ term: "Has Been Stopped", type: "Present Perfect Passive", desc: "Telah dihentikan." }] },
+                    { label: "V2: Manual", englishText: "FAULT: Drive Roller Rotation is Obstructed by Foreign Object. Clear Obstruction.", translation: "Kesalahan: Putaran Rol Terhalang Benda Asing.", grammarPoints: [{ term: "is Obstructed", type: "Present Passive", desc: "Terhalang." }] },
+                    { label: "V3: SOP", englishText: "DANGER: Severe Torque Overload Was Triggered by Seized Mechanism.", translation: "Bahaya: Beban Torsi Berlebih Dipicu Mekanisme Macet.", grammarPoints: [{ term: "Was Triggered", type: "Past Passive", desc: "Terpicu." }] }
+                ],
+                vocabList: [{ word: "Mechanical Jamming", pos: "Adj + Gerund", meaning: "Kemacetan mekanis", synonyms: "Blockage" }]
+            },
+            vibration: {
+                code: "ERR-VIB-06", sensorName: "Spindle Vibration (mm/s)", shortMetric: "Vibration", safeLimit: "< 4.5 mm/s", unit: "mm/s", normalBase: 1.6, faultSpike: 14.5,
+                localSop: "<strong>Bahasa Bengkel:</strong> Laher spindel oblak.<br><strong>SOP:</strong> Ganti *bearing*.",
+                variations: [
+                    { label: "V1: HMI", englishText: "DANGER: Excessive Vibration is Detected. Replace Worn Spindle Bearing Immediately.", translation: "Bahaya: Getaran Berlebih Terdeteksi. Segera Ganti Laher.", grammarPoints: [{ term: "Replace", type: "Imperative", desc: "Perintah langsung." }] },
+                    { label: "V2: Manual", englishText: "WARNING: Abnormal Oscillation Has Been Induced by Degraded Ball Bearing.", translation: "Peringatan: Getaran Dipicu Laher Rusak.", grammarPoints: [{ term: "Has Been Induced", type: "Present Perfect Passive", desc: "Dipicu." }] },
+                    { label: "V3: SOP", englishText: "FAULT: High Vibration Amplitude is Sensed. Damaged Bearing Must Be Replaced.", translation: "Kesalahan: Amplitudo Getaran Tinggi Terbaca. Laher Harus Diganti.", grammarPoints: [{ term: "Must Be Replaced", type: "Modal Passive", desc: "Wajib diganti." }] }
+                ],
+                vocabList: [{ word: "Worn", pos: "Participle Adj", meaning: "Aus / Oblak", synonyms: "Damaged" }]
+            },
+            coolant: {
+                code: "ERR-CLN-07", sensorName: "Coolant Flow Rate (L/m)", shortMetric: "Coolant Flow", safeLimit: "25 - 40 L/m", unit: "L/m", normalBase: 32.0, faultSpike: 4.5,
+                localSop: "<strong>Bahasa Bengkel:</strong> Air radiator/coolant mampet.<br><strong>SOP:</strong> Bersihkan saringan filter.",
+                variations: [
+                    { label: "V1: HMI", englishText: "CAUTION: Coolant Flow is Restricted by Clogged Filter. Cooling Pump is Being Shut Down.", translation: "Perhatian: Aliran Pendingin Terhambat Saringan Mampet.", grammarPoints: [{ term: "is Restricted", type: "Present Passive", desc: "Tertahan." }] },
+                    { label: "V2: Manual", englishText: "WARNING: Cooling Liquid Circulation Has Been Blocked in Heat Exchanger.", translation: "Peringatan: Sirkulasi Tertutup di Radiator.", grammarPoints: [{ term: "Has Been Blocked", type: "Present Perfect Passive", desc: "Tersumbat." }] },
+                    { label: "V3: SOP", englishText: "FAULT: Low Coolant Discharge is Detected. Strainer Mesh Must Be Cleaned.", translation: "Kesalahan: Debit Rendah Terdeteksi. Kasa Saringan Harus Dibersihkan.", grammarPoints: [{ term: "Must Be Cleaned", type: "Modal Passive", desc: "Wajib dibersihkan." }] }
+                ],
+                vocabList: [{ word: "Clogged Filter", pos: "Adj + Noun", meaning: "Saringan mampet", synonyms: "Blocked Strainer" }]
+            },
+            misalignment: {
+                code: "ERR-ALN-08", sensorName: "Coupling Deviation (mm)", shortMetric: "Misalignment", safeLimit: "< 0.05 mm", unit: "mm", normalBase: 0.02, faultSpike: 0.48,
+                localSop: "<strong>Bahasa Bengkel:</strong> Kopling motor tidak senter.<br><strong>SOP:</strong> Setel ulang *alignment*.",
+                variations: [
+                    { label: "V1: HMI", englishText: "FAULT: Severe Angular Misalignment is Detected on Motor Coupling. Drive Shaft Should Be Realigned.", translation: "Kesalahan: Ketidaksejajaran Sudut Terdeteksi. Poros Harus Disenter Ulang.", grammarPoints: [{ term: "Should Be Realigned", type: "Modal Passive", desc: "Sebaiknya diluruskan." }] },
+                    { label: "V2: Manual", englishText: "WARNING: Excessive Shaft Runout Has Been Measured at Flexible Coupling.", translation: "Peringatan: Keolengan Poros Telah Terukur.", grammarPoints: [{ term: "Has Been Measured", type: "Present Perfect Passive", desc: "Telah terukur." }] },
+                    { label: "V3: SOP", englishText: "ALARM: Coupling Offset Exceeds Tolerance Limit. Laser Alignment Must Be Performed.", translation: "Alarm: Pergeseran Melebihi Batas. Penyejajaran Laser Harus Dilakukan.", grammarPoints: [{ term: "Must Be Performed", type: "Modal Passive", desc: "Wajib dilakukan." }] }
+                ],
+                vocabList: [{ word: "Angular Misalignment", pos: "Compound Noun", meaning: "Ketidaksejajaran sudut", synonyms: "Shaft Runout" }]
+            }
+        };
+
+        let currentScenarioKey = null, currentVariationIndex = 0, isFaultActive = false, chartInstance = null;
+
+        function initChart() {
+            const ctx = document.getElementById('telemetryChart').getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 15}, (_, i) => `-${15-i}s`),
+                    datasets: [{ data: Array.from({length: 15}, () => 55), borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.15)', borderWidth: 2.5, fill: true, tension: 0.35 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#9ca3af', font: { size: 10 } } }, y: { ticks: { color: '#9ca3af', font: { size: 10 } } } } }
+            });
+            setInterval(() => {
+                if (!chartInstance || !currentScenarioKey) return;
+                const sc = faultDatabase[currentScenarioKey], arr = chartInstance.data.datasets[0].data;
+                arr.shift();
+                arr.push(+(isFaultActive ? sc.faultSpike : sc.normalBase).toFixed(1));
+                chartInstance.update();
+            }, 1200);
+        }
+
+        function selectScenario(key) {
+            currentScenarioKey = key; currentVariationIndex = 0; isFaultActive = true;
+            document.getElementById('standby-screen').classList.add('hidden');
+            const ws = document.getElementById('active-workspace');
+            ws.classList.remove('hidden'); ws.classList.add('flex');
+            document.querySelectorAll('.fault-btn').forEach(b => b.classList.remove('ring-2', 'ring-amber-400', 'bg-gray-800'));
+            document.getElementById(`btn-${key}`).classList.add('ring-2', 'ring-amber-400', 'bg-gray-800');
+            document.getElementById('system-status-badge').className = "flex items-center space-x-2 bg-red-500/20 border border-red-500/50 text-red-400 px-3 py-1.5 rounded-full text-xs font-mono-tech font-semibold";
+            document.getElementById('status-text').textContent = `FAULT ACTIVE // ${faultDatabase[key].code}`;
+            renderContent();
+        }
+
+        function switchVariation(idx) { currentVariationIndex = idx; renderContent(); }
+
+        function renderContent() {
+            const sc = faultDatabase[currentScenarioKey], v = sc.variations[currentVariationIndex];
+            document.querySelectorAll('.var-btn').forEach((b, i) => b.className = `var-btn text-xs px-2.5 py-1 rounded font-mono-tech font-semibold ${i === currentVariationIndex ? 'bg-amber-500 text-gray-950 font-bold' : 'text-gray-300 hover:bg-gray-800'}`);
+            document.getElementById('fault-code-id').textContent = `FAULT CODE: ${sc.code}`;
+            document.getElementById('var-style-badge').textContent = v.label;
+            document.getElementById('fault-english-text').textContent = v.englishText;
+            document.getElementById('trans-technical').textContent = v.translation;
+            document.getElementById('trans-local-sop').innerHTML = sc.localSop;
+            document.getElementById('grammar-cards').innerHTML = v.grammarPoints.map(g => `<div class="bg-industrial-900 border border-gray-700 rounded-lg p-3"><div class="text-xs font-mono-tech font-bold text-amber-400 mb-1">"${g.term}"</div><div class="text-[10px] bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded inline-block mb-1">${g.type}</div><p class="text-xs text-gray-300">${g.desc}</p></div>`).join('');
+            document.getElementById('vocab-table-body').innerHTML = sc.vocabList.map(w => `<tr class="border-b border-gray-800"><td class="py-2 px-3 font-bold text-white">${w.word}</td><td class="py-2 px-3 text-amber-300">${w.pos}</td><td class="py-2 px-3 text-gray-300">${w.meaning}</td><td class="py-2 px-3 text-emerald-400">${w.synonyms}</td><td class="py-2 px-3 text-center"><button onclick="speakText('${w.word}')" class="text-amber-400"><i class="fa-solid fa-volume-low"></i></button></td></tr>`).join('');
+            document.getElementById('all-variations-list').innerHTML = sc.variations.map((x, i) => `<div onclick="switchVariation(${i})" class="p-2 rounded cursor-pointer border ${i === currentVariationIndex ? 'bg-amber-500/10 border-amber-500' : 'bg-industrial-800 border-gray-700'}"><span class="font-bold text-amber-400 mr-2">${x.label}:</span>${x.englishText}</div>`).join('');
+            document.getElementById('chart-subtitle').textContent = `Grafik: ${sc.sensorName}`;
+            document.getElementById('telemetry-live-val').textContent = `${sc.shortMetric}: ${sc.faultSpike} ${sc.unit}`;
+        }
+
+        function openModule(name) {
+            document.querySelectorAll('.mod-panel').forEach(p => p.classList.add('hidden'));
+            document.getElementById(`panel-${name}`).classList.remove('hidden');
+            document.getElementById('module-prompt').classList.add('hidden');
+            if (name === 'telemetry' && chartInstance) chartInstance.resize();
+        }
+
+        function closeModules() {
+            document.querySelectorAll('.mod-panel').forEach(p => p.classList.add('hidden'));
+            document.getElementById('module-prompt').classList.remove('hidden');
+        }
+
+        function resetToStandby() {
+            currentScenarioKey = null; isFaultActive = false; closeModules();
+            document.getElementById('active-workspace').classList.add('hidden');
+            document.getElementById('standby-screen').classList.remove('hidden');
+            document.querySelectorAll('.fault-btn').forEach(b => b.classList.remove('ring-2', 'ring-amber-400', 'bg-gray-800'));
+            document.getElementById('system-status-badge').className = "flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 px-3 py-1.5 rounded-full text-xs font-mono-tech font-semibold";
+            document.getElementById('status-text').textContent = "SYSTEM STANDBY // NORMAL";
+        }
+
+        function speakText(txt) { if ('speechSynthesis' in window) { window.speechSynthesis.cancel(); window.speechSynthesis.speak(new SpeechSynthesisUtterance(txt)); } }
+        function speakCurrentFault() { if (currentScenarioKey) speakText(faultDatabase[currentScenarioKey].variations[currentVariationIndex].englishText); }
+
+        window.addEventListener('DOMContentLoaded', initChart);
+    </script>
+</body>
+</html>

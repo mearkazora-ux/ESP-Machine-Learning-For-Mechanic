@@ -3,14 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MechaLingua HMI v5.4 - Technical English Simulator</title>
+    <title>MechaLingua HMI v5.5 - Technical English Paraphrase & Writing Evaluator</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+    <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         tailwind.config = {
             darkMode: 'class',
-            theme: { extend: { colors: { industrial: { 950: '#070a12', 900: '#0b0f19', 800: '#111827', 700: '#1f2937' } } } }
+            theme: {
+                extend: {
+                    colors: {
+                        industrial: {
+                            950: '#070a12',
+                            900: '#0b0f19',
+                            800: '#111827',
+                            700: '#1f2937',
+                            accent: '#f59e0b',
+                            danger: '#ef4444',
+                            normal: '#10b981'
+                        }
+                    }
+                }
+            }
         }
     </script>
     <style>
@@ -19,28 +36,34 @@
         .font-mono-tech { font-family: 'JetBrains Mono', monospace; }
         .blink-warning { animation: blinker 1.2s linear infinite; }
         @keyframes blinker { 50% { opacity: 0.35; } }
+        .fade-in { animation: fadeIn 0.25s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
         .title-glow { text-shadow: 0 0 25px rgba(245, 158, 11, 0.35); }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #111827; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
     </style>
 </head>
 <body class="bg-industrial-950 text-gray-100 min-h-screen flex flex-col">
 
-    <!-- HEADER -->
-    <header class="bg-gradient-to-r from-industrial-900 via-industrial-800 to-industrial-900 border-b-2 border-amber-500/50 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-lg">
+    <!-- HIGHLIGHTED HERO TITLE & TOP HEADER -->
+    <header class="bg-gradient-to-r from-industrial-900 via-industrial-800 to-industrial-900 border-b-2 border-amber-500/50 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-[0_4px_30px_rgba(245,158,11,0.12)]">
         <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div class="flex items-start sm:items-center space-x-3.5">
-                <div class="bg-gradient-to-br from-amber-400 to-amber-600 text-gray-950 p-3 rounded-xl font-extrabold text-2xl flex items-center justify-center shadow ring-2 ring-amber-300/50 shrink-0">
+                <div class="bg-gradient-to-br from-amber-400 to-amber-600 text-gray-950 p-3 rounded-xl font-extrabold text-2xl flex items-center justify-center shadow-[0_0_20px_rgba(245,158,11,0.5)] ring-2 ring-amber-300/50 shrink-0">
                     <i class="fa-solid fa-gears"></i>
                 </div>
                 <div>
                     <div class="flex flex-wrap items-center gap-2">
-                        <span class="text-[10px] font-mono-tech uppercase tracking-widest bg-amber-500 text-gray-950 font-extrabold px-2 py-0.5 rounded">ESP Mechanical Engineering</span>
+                        <span class="text-[10px] font-mono-tech uppercase tracking-widest bg-amber-500 text-gray-950 font-extrabold px-2 py-0.5 rounded shadow">ESP Mechanical Engineering</span>
                         <span class="text-[10px] font-mono-tech uppercase tracking-wider bg-blue-500/20 text-blue-300 border border-blue-500/40 px-2 py-0.5 rounded">IoT HMI Simulator + CALL</span>
                     </div>
-                    <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white mt-1 title-glow">
-                        <span class="bg-gradient-to-r from-white via-amber-200 to-amber-400 bg-clip-text text-transparent">MechaLingua HMI v5.4</span>
+                    <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white mt-1 title-glow flex flex-wrap items-center gap-2">
+                        <span class="bg-gradient-to-r from-white via-amber-200 to-amber-400 bg-clip-text text-transparent">MechaLingua HMI</span>
+                        <span class="text-xs sm:text-sm bg-amber-500/20 text-amber-300 border border-amber-400/50 px-2.5 py-0.5 rounded-md font-mono-tech font-bold">v5.5</span>
                     </h1>
                     <p class="text-xs sm:text-sm text-gray-300 font-medium mt-0.5">
-                        Interactive Fault Simulator with <span class="text-amber-400 font-semibold underline decoration-amber-500/60 underline-offset-4">Technical English Breakdown &amp; Sentence Builder</span>
+                        Interactive Fault Simulator with <span class="text-amber-400 font-semibold underline decoration-amber-500/60 underline-offset-4">Technical English Breakdown &amp; Paraphrase Writing Evaluator</span>
                     </p>
                 </div>
             </div>
@@ -49,21 +72,24 @@
                     <span id="status-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
                     <span id="status-text">SYSTEM STANDBY // NORMAL</span>
                 </div>
-                <button type="button" onclick="resetToStandby()" class="bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs px-3.5 py-2 rounded-lg font-semibold transition flex items-center gap-1.5 border border-gray-700">
+                <button type="button" onclick="resetToStandby()" class="bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs px-3.5 py-2 rounded-lg font-semibold transition flex items-center gap-1.5 border border-gray-700 shadow">
                     <i class="fa-solid fa-power-off text-emerald-400"></i> Standby / Reset
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- MAIN -->
+    <!-- MAIN WORKSPACE -->
     <main class="flex-1 p-4 sm:p-6 max-w-6xl w-full mx-auto flex flex-col gap-5">
 
-        <!-- SCENARIO BUTTONS -->
+        <!-- STEP 1: MACHINE FAULT SCENARIO SELECTOR -->
         <section class="bg-industrial-800 border border-gray-800 rounded-xl p-4 shadow-lg">
-            <h2 class="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-2 mb-3">
-                <i class="fa-solid fa-sliders"></i> Step 1: Select Machine Fault Scenario
-            </h2>
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                <h2 class="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders"></i> Step 1: Select Machine Fault Scenario (8 Industrial Triggers)
+                </h2>
+                <span class="text-[11px] text-gray-400">Click any scenario below to launch the HMI Console &amp; ESP Modules</span>
+            </div>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                 <button type="button" onclick="selectScenario('thermal')" id="btn-thermal" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700 transition flex items-center gap-2.5">
                     <div class="w-8 h-8 rounded bg-red-500/15 text-red-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-temperature-high text-sm"></i></div>
@@ -101,18 +127,25 @@
         </section>
 
         <!-- STANDBY SCREEN -->
-        <section id="standby-screen" class="flex-1 bg-industrial-800/50 border-2 border-dashed border-gray-800 rounded-2xl p-8 flex flex-col items-center justify-center text-center min-h-[300px]">
+        <section id="standby-screen" class="flex-1 bg-industrial-800/50 border-2 border-dashed border-gray-800 rounded-2xl p-8 flex flex-col items-center justify-center text-center min-h-[320px]">
             <div class="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center text-2xl mb-4">
                 <i class="fa-solid fa-laptop-code"></i>
             </div>
             <h2 class="text-lg sm:text-xl font-bold text-white mb-2">System Ready (Standby Mode)</h2>
-            <p class="text-xs sm:text-sm text-gray-400 max-w-lg">Click any of the <strong>8 Machine Fault Scenario buttons above</strong> to launch the HMI Console, Grammar Breakdown, IoT Sensor Chart, and Sentence Builder.</p>
+            <p class="text-xs sm:text-sm text-gray-400 max-w-lg mb-5">
+                Click any of the <strong>8 Machine Fault Scenario buttons above</strong> to open the HMI Diagnostic Console, Full Word-by-Word Grammar Breakdown, IoT Telemetry Chart, and the <strong>Free-Typing Paraphrase &amp; Grammar Checker</strong>.
+            </p>
+            <div class="flex flex-wrap justify-center gap-2 text-[11px] font-mono-tech">
+                <span class="bg-industrial-900 border border-gray-700 text-gray-300 px-3 py-1.5 rounded-lg"><i class="fa-solid fa-check text-emerald-400 mr-1"></i> Full English Interface</span>
+                <span class="bg-industrial-900 border border-gray-700 text-gray-300 px-3 py-1.5 rounded-lg"><i class="fa-solid fa-play text-red-400 mr-1"></i> Interactive IoT Failure Trigger</span>
+                <span class="bg-industrial-900 border border-amber-500/40 text-amber-300 px-3 py-1.5 rounded-lg"><i class="fa-solid fa-pen-to-square text-amber-400 mr-1"></i> Custom Sentence Paraphrase Evaluator</span>
+            </div>
         </section>
 
         <!-- ACTIVE WORKSPACE -->
         <div id="active-workspace" class="hidden flex-col gap-5">
 
-            <!-- HMI DISPLAY -->
+            <!-- HMI DISPLAY CONSOLE -->
             <section class="bg-black border-2 border-gray-800 rounded-xl p-5 shadow-2xl">
                 <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-800 pb-3.5 mb-4">
                     <div class="flex items-center space-x-2">
@@ -122,7 +155,7 @@
                         <span class="text-xs font-mono-tech text-gray-400 ml-2">HMI_DIAGNOSTIC_DISPLAY // PLC_UNIT</span>
                     </div>
                     <div class="flex flex-wrap items-center gap-1.5 bg-industrial-900 p-1 rounded-lg border border-gray-800">
-                        <span class="text-[11px] text-gray-400 px-2 font-medium">Sentence Style:</span>
+                        <span class="text-[11px] text-gray-400 px-2 font-medium"><i class="fa-solid fa-shuffle text-amber-400 mr-1"></i>Sentence Style:</span>
                         <button type="button" onclick="switchVariation(0)" id="var-btn-0" class="var-btn text-xs px-2.5 py-1 rounded font-mono-tech font-semibold">V1: HMI</button>
                         <button type="button" onclick="switchVariation(1)" id="var-btn-1" class="var-btn text-xs px-2.5 py-1 rounded font-mono-tech font-semibold">V2: Manual</button>
                         <button type="button" onclick="switchVariation(2)" id="var-btn-2" class="var-btn text-xs px-2.5 py-1 rounded font-mono-tech font-semibold">V3: SOP</button>
@@ -138,12 +171,12 @@
                         </div>
                         <div id="fault-english-text" class="text-base sm:text-xl font-bold text-white tracking-wide"></div>
                     </div>
-                    <button type="button" onclick="speakCurrentFault()" class="shrink-0 bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold text-xs px-4 py-2.5 rounded-lg flex items-center justify-center gap-2">
+                    <button type="button" onclick="speakCurrentFault()" class="shrink-0 bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold text-xs px-4 py-2.5 rounded-lg flex items-center justify-center gap-2 shadow">
                         <i class="fa-solid fa-volume-high"></i> Voice (TTS)
                     </button>
                 </div>
 
-                <!-- MODULE TABS -->
+                <!-- STEP 2: MODULE NAVIGATION TABS -->
                 <div class="mt-5 pt-4 border-t border-gray-800">
                     <div class="grid grid-cols-2 sm:grid-cols-3 lg:flex lg:flex-wrap gap-2">
                         <button type="button" onclick="openModule('fullBreakdown')" id="tab-fullBreakdown" class="mod-tab text-xs font-semibold px-3 py-2 rounded-lg border border-gray-700 bg-industrial-800 hover:bg-gray-700 text-gray-200 flex items-center justify-center gap-1.5">
@@ -153,26 +186,29 @@
                             <i class="fa-solid fa-language text-emerald-400"></i> 2. Translation &amp; SOP
                         </button>
                         <button type="button" onclick="openModule('vocab')" id="tab-vocab" class="mod-tab text-xs font-semibold px-3 py-2 rounded-lg border border-gray-700 bg-industrial-800 hover:bg-gray-700 text-gray-200 flex items-center justify-center gap-1.5">
-                            <i class="fa-solid fa-spell-check text-amber-400"></i> 3. Vocabulary
+                            <i class="fa-solid fa-spell-check text-amber-400"></i> 3. Synonyms
                         </button>
                         <button type="button" onclick="openModule('telemetry')" id="tab-telemetry" class="mod-tab text-xs font-semibold px-3 py-2 rounded-lg border border-gray-700 bg-industrial-800 hover:bg-gray-700 text-gray-200 flex items-center justify-center gap-1.5">
                             <i class="fa-solid fa-chart-line text-red-400"></i> 4. IoT Chart
                         </button>
-                        <button type="button" onclick="openModule('practice')" id="tab-practice" class="mod-tab col-span-2 sm:col-span-1 text-xs font-bold px-3.5 py-2 rounded-lg border border-amber-500/60 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 flex items-center justify-center gap-1.5">
-                            <i class="fa-solid fa-puzzle-piece text-amber-400"></i> 5. Sentence Builder
+                        <button type="button" onclick="openModule('practice')" id="tab-practice" class="mod-tab col-span-2 sm:col-span-1 text-xs font-bold px-3.5 py-2 rounded-lg border border-amber-500/60 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 flex items-center justify-center gap-1.5 shadow">
+                            <i class="fa-solid fa-pen-to-square text-amber-400"></i> 5. Write Your Own Alert
                         </button>
                     </div>
                 </div>
             </section>
 
-            <!-- MODULE 1: FULL BREAKDOWN -->
-            <section id="panel-fullBreakdown" class="mod-panel hidden bg-industrial-800 border border-gray-700 rounded-xl p-5 shadow-lg">
+            <!-- MODULE 1: FULL WORD-BY-WORD GRAMMAR BREAKDOWN -->
+            <section id="panel-fullBreakdown" class="mod-panel hidden bg-industrial-800 border border-gray-700 rounded-xl p-5 shadow-lg fade-in">
                 <div class="flex items-center justify-between border-b border-gray-700 pb-3 mb-4">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-blue-400">Module 1: Full Word-by-Word Grammar Breakdown</h3>
+                    <div>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-blue-400">Module 1: Full Word-by-Word Grammar Breakdown (ESP)</h3>
+                        <p class="text-[11px] text-gray-400 mt-0.5">Every word/phrase analyzed by Part of Speech, Passive/ESP Formula, and Technical Role.</p>
+                    </div>
                     <button type="button" onclick="closeModules()" class="text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i> Close</button>
                 </div>
                 <div class="bg-black border border-amber-500/40 rounded-lg p-4 mb-4">
-                    <div class="text-xs font-bold uppercase text-amber-400 mb-2">Parts of Speech Structure:</div>
+                    <div class="text-xs font-bold uppercase text-amber-400 mb-2.5">Visual Sentence Structure (Parts of Speech):</div>
                     <div id="pos-sentence-view" class="flex flex-wrap items-start gap-2"></div>
                 </div>
                 <div class="bg-industrial-900 border border-blue-500/40 rounded-lg p-3.5 mb-4">
@@ -195,38 +231,41 @@
                 </div>
             </section>
 
-            <!-- MODULE 2: TRANSLATION (INDONESIAN) -->
-            <section id="panel-translation" class="mod-panel hidden bg-industrial-800 border border-gray-700 rounded-xl p-5 shadow-lg">
+            <!-- MODULE 2: TRANSLATION & WORKSHOP SOP (INDONESIAN ALLOWED HERE) -->
+            <section id="panel-translation" class="mod-panel hidden bg-industrial-800 border border-gray-700 rounded-xl p-5 shadow-lg fade-in">
                 <div class="flex items-center justify-between border-b border-gray-700 pb-3 mb-4">
                     <h3 class="text-sm font-bold uppercase tracking-wider text-emerald-400">Module 2: Technical Translation &amp; Workshop SOP</h3>
                     <button type="button" onclick="closeModules()" class="text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i> Close</button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="bg-emerald-950/30 border border-emerald-600/40 rounded-lg p-4">
-                        <div class="text-xs font-bold uppercase text-emerald-400 mb-1.5">Indonesian Translation (Terjemahan Baku)</div>
+                        <div class="text-xs font-bold uppercase text-emerald-400 mb-1.5"><i class="fa-solid fa-circle-check mr-1"></i> Indonesian Translation (Terjemahan Teknis Baku)</div>
                         <p id="trans-technical" class="text-sm font-semibold text-white leading-relaxed"></p>
                     </div>
                     <div class="bg-industrial-900 border border-gray-700 rounded-lg p-4">
-                        <div class="text-xs font-bold uppercase text-amber-400 mb-1.5">Workshop Slang &amp; Repair SOP</div>
+                        <div class="text-xs font-bold uppercase text-amber-400 mb-1.5"><i class="fa-solid fa-helmet-safety mr-1"></i> Local Workshop Terms &amp; Repair SOP</div>
                         <p id="trans-local-sop" class="text-xs text-gray-300 leading-relaxed"></p>
                     </div>
                 </div>
             </section>
 
-            <!-- MODULE 3: VOCABULARY -->
-            <section id="panel-vocab" class="mod-panel hidden bg-industrial-800 border border-gray-700 rounded-xl p-5 shadow-lg">
+            <!-- MODULE 3: VOCABULARY & SYNONYMS -->
+            <section id="panel-vocab" class="mod-panel hidden bg-industrial-800 border border-gray-700 rounded-xl p-5 shadow-lg fade-in">
                 <div class="flex items-center justify-between border-b border-gray-700 pb-3 mb-4">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-amber-400">Module 3: Vocabulary &amp; Technical Synonyms</h3>
+                    <div>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-amber-400">Module 3: Technical Vocabulary &amp; Synonym Bank</h3>
+                        <p class="text-[11px] text-gray-400 mt-0.5">Use these synonyms when writing your own custom alert sentence in Module 5.</p>
+                    </div>
                     <button type="button" onclick="closeModules()" class="text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i> Close</button>
                 </div>
                 <div class="overflow-x-auto rounded-lg border border-gray-700 mb-4">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-industrial-900 text-[11px] uppercase text-gray-400 border-b border-gray-700">
-                                <th class="py-2.5 px-3">Term</th>
+                                <th class="py-2.5 px-3">Primary Term</th>
                                 <th class="py-2.5 px-3">Part of Speech</th>
                                 <th class="py-2.5 px-3">Technical Meaning</th>
-                                <th class="py-2.5 px-3">Alternative Synonyms</th>
+                                <th class="py-2.5 px-3">Valid Synonyms for Paraphrasing</th>
                                 <th class="py-2.5 px-3 text-center">Audio</th>
                             </tr>
                         </thead>
@@ -234,13 +273,13 @@
                     </table>
                 </div>
                 <div class="bg-industrial-900 border border-gray-700 rounded-lg p-4">
-                    <div class="text-xs font-bold uppercase text-amber-400 mb-2">Comparison of 3 Sentence Variations:</div>
+                    <div class="text-xs font-bold uppercase text-amber-400 mb-2">3 Reference Sentence Variations (Click to switch):</div>
                     <div id="all-variations-list" class="space-y-2 text-xs"></div>
                 </div>
             </section>
 
-            <!-- MODULE 4: IOT TELEMETRY CHART -->
-            <section id="panel-telemetry" class="mod-panel hidden bg-industrial-800 border border-gray-700 rounded-xl p-5 shadow-lg">
+            <!-- MODULE 4: IOT TELEMETRY CHART WITH START FAILURE BUTTON -->
+            <section id="panel-telemetry" class="mod-panel hidden bg-industrial-800 border border-gray-700 rounded-xl p-5 shadow-lg fade-in">
                 <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-700 pb-3 mb-4">
                     <div>
                         <h3 class="text-sm font-bold uppercase tracking-wider text-red-400">Module 4: Real-Time IoT Telemetry Sensor Chart</h3>
@@ -254,15 +293,15 @@
                 <div class="flex flex-wrap items-center justify-between gap-3 mb-4 bg-industrial-900 p-3 rounded-lg border border-gray-800">
                     <div class="flex items-center gap-2">
                         <span class="text-xs text-gray-300 font-medium">Simulation Control:</span>
-                        <button type="button" onclick="startFailureSimulation()" class="bg-red-600 hover:bg-red-500 text-white font-bold text-xs px-3.5 py-1.5 rounded shadow flex items-center gap-1.5">
+                        <button type="button" onclick="startFailureSimulation()" class="bg-red-600 hover:bg-red-500 text-white font-bold text-xs px-3.5 py-1.5 rounded shadow flex items-center gap-1.5 transition">
                             <i class="fa-solid fa-play"></i> Start Failure Simulation
                         </button>
-                        <button type="button" onclick="resetFailureSimulation()" class="bg-gray-700 hover:bg-gray-600 text-gray-200 font-bold text-xs px-3.5 py-1.5 rounded shadow flex items-center gap-1.5">
+                        <button type="button" onclick="resetFailureSimulation()" class="bg-gray-700 hover:bg-gray-600 text-gray-200 font-bold text-xs px-3.5 py-1.5 rounded shadow flex items-center gap-1.5 transition">
                             <i class="fa-solid fa-rotate-right"></i> Reset Normal
                         </button>
                     </div>
                     <div id="sim-status-indicator" class="text-xs font-mono-tech font-bold text-emerald-400">
-                        STATUS: NORMAL RUNNING (Click 'Start Failure' to project fault)
+                        STATUS: NORMAL RUNNING (Click 'Start Failure' to project fault spike)
                     </div>
                 </div>
                 <div class="relative w-full h-56 bg-industrial-900/60 p-3 rounded-lg border border-gray-800">
@@ -270,45 +309,105 @@
                 </div>
             </section>
 
-            <!-- MODULE 5: SENTENCE BUILDER -->
-            <section id="panel-practice" class="mod-panel hidden bg-industrial-800 border border-gray-700 rounded-xl p-5 shadow-lg">
-                <div class="flex items-center justify-between border-b border-gray-700 pb-3 mb-4">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-amber-400">Module 5: Technical English Sentence Builder</h3>
-                    <button type="button" onclick="closeModules()" class="text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i> Close</button>
-                </div>
-                <div class="bg-industrial-900 border border-gray-700 rounded-lg p-4 mb-4">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-[10px] bg-blue-500/20 text-blue-300 border border-blue-500/40 px-2 py-0.5 rounded font-mono-tech">ESP Exercise</span>
-                        <span id="quiz-score-display" class="text-xs font-mono-tech font-bold text-emerald-400">Score: 0</span>
+            <!-- MODULE 5: FREE-TYPING PARAPHRASE & GRAMMAR CHECKER (NEW IN v5.5) -->
+            <section id="panel-practice" class="mod-panel hidden bg-industrial-800 border-2 border-amber-500/50 rounded-xl p-5 shadow-2xl fade-in">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-gray-700 pb-3 mb-4">
+                    <div>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-amber-400 flex items-center gap-2">
+                            <i class="fa-solid fa-pen-to-square"></i> Module 5: Technical English Paraphrase &amp; Writing Evaluator
+                        </h3>
+                        <p class="text-[11px] text-gray-300 mt-0.5">
+                            Write your <strong>own English warning sentence</strong> for this machine fault. Your sentence <strong>must not copy</strong> the reference sentence directly (&lt;75% word similarity) and must use valid <strong>ESP Grammar (Passive Voice / Modal Passive / Imperative)</strong>.
+                        </p>
                     </div>
-                    <div id="quiz-target-meaning" class="text-sm font-bold text-amber-300 bg-industrial-950 p-3 rounded border border-amber-500/30 mb-2"></div>
-                    <div id="quiz-grammar-hint" class="text-[11px] text-gray-400 font-mono-tech"></div>
+                    <div class="flex items-center gap-3">
+                        <span class="bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-mono-tech font-bold px-3 py-1 rounded-full">
+                            Approved Sentences: <span id="writing-score">0</span>
+                        </span>
+                        <button type="button" onclick="closeModules()" class="text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i> Close</button>
+                    </div>
                 </div>
-                <div id="quiz-answer-dropzone" class="bg-black border border-gray-700 rounded-lg p-4 mb-4 min-h-[64px] flex flex-wrap items-center gap-2"></div>
-                <div id="quiz-word-bank" class="flex flex-wrap items-center gap-1.5 mb-4"></div>
-                <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-gray-700">
-                    <div class="flex items-center gap-2">
-                        <button type="button" onclick="checkQuizAnswer()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2 rounded">
-                            <i class="fa-solid fa-check"></i> Check Answer
+
+                <!-- Reference Context & Synonym Helper Bank -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 mb-4">
+                    <div class="lg:col-span-6 bg-industrial-900 border border-gray-700 rounded-lg p-3.5">
+                        <div class="text-[10px] font-mono-tech uppercase text-red-400 font-bold mb-1">
+                            <i class="fa-solid fa-ban mr-1"></i> Original Reference Sentence (Do Not Copy Directly):
+                        </div>
+                        <p id="write-ref-english" class="text-xs sm:text-sm font-mono-tech font-bold text-white mb-2"></p>
+                        <div class="text-[10px] font-mono-tech uppercase text-emerald-400 font-bold mb-0.5">Target Meaning to Express:</div>
+                        <p id="write-ref-meaning" class="text-xs text-gray-300 italic"></p>
+                    </div>
+
+                    <div class="lg:col-span-6 bg-industrial-900 border border-blue-500/30 rounded-lg p-3.5 flex flex-col justify-between">
+                        <div>
+                            <div class="text-[10px] font-mono-tech uppercase text-blue-400 font-bold mb-1.5">
+                                <i class="fa-solid fa-toolbox mr-1"></i> Recommended Synonyms &amp; Passive Verbs (Click to insert):
+                            </div>
+                            <div id="write-synonym-chips" class="flex flex-wrap gap-1.5 mb-2"></div>
+                        </div>
+                        <div class="text-[11px] text-gray-400 border-t border-gray-800 pt-2 font-mono-tech">
+                            <strong class="text-amber-400">Grammar Rule:</strong> Use <span class="text-white">is/was/has been/must be/should be + Verb-3 (Past Participle)</span> or <span class="text-white">Imperative Verb-1</span>.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Free-Typing Input Area -->
+                <div class="mb-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                        <label for="user-sentence-input" class="text-xs font-bold text-gray-200">
+                            <i class="fa-solid fa-keyboard text-amber-400 mr-1"></i> Type Your Custom English Warning / Alarm Sentence:
+                        </label>
+                        <span id="similarity-live-badge" class="text-[11px] font-mono-tech px-2 py-0.5 rounded bg-gray-900 text-gray-400 border border-gray-700">
+                            Similarity to Original: 0%
+                        </span>
+                    </div>
+                    <textarea id="user-sentence-input" rows="2" oninput="updateLiveSimilarity()" placeholder="Example: CAUTION: High temperature is sensed on the main rotor axle. Cooling fan must be checked." class="w-full p-3.5 rounded-xl bg-black border-2 border-gray-700 focus:border-amber-400 focus:outline-none text-sm font-mono-tech text-white placeholder-gray-600 transition"></textarea>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-gray-700/80">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button type="button" onclick="evaluateUserSentence()" class="bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-extrabold text-xs px-4 py-2.5 rounded-lg transition flex items-center gap-1.5 shadow-lg">
+                            <i class="fa-solid fa-spell-check"></i> Check My Sentence &amp; Grammar
                         </button>
-                        <button type="button" onclick="clearQuizSelection()" class="bg-gray-700 hover:bg-gray-600 text-gray-200 text-xs px-3 py-2 rounded font-semibold">
+                        <button type="button" onclick="fillSampleParaphrase()" class="bg-blue-600/30 hover:bg-blue-600/50 border border-blue-500/50 text-blue-200 font-semibold text-xs px-3.5 py-2.5 rounded-lg transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i> Try Sample Paraphrase
+                        </button>
+                        <button type="button" onclick="fillIntentionalErrorSample()" class="bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 font-semibold text-xs px-3 py-2.5 rounded-lg transition flex items-center gap-1.5" title="Test how the system corrects wrong grammar">
+                            <i class="fa-solid fa-bug"></i> Test Error Correction
+                        </button>
+                        <button type="button" onclick="clearUserSentence()" class="bg-gray-700 hover:bg-gray-600 text-gray-200 font-medium text-xs px-3 py-2.5 rounded-lg transition">
                             Clear
                         </button>
                     </div>
-                    <div id="quiz-feedback-msg" class="text-xs font-bold"></div>
-                    <button type="button" onclick="nextQuizQuestion()" class="bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold text-xs px-4 py-2 rounded">
-                        Next Scenario <i class="fa-solid fa-arrow-right"></i>
-                    </button>
                 </div>
+
+                <!-- Detailed Diagnostic & Correction Result Panel -->
+                <div id="writing-evaluation-box" class="hidden mt-4 rounded-xl border p-4 fade-in space-y-3"></div>
             </section>
+
         </div>
     </main>
 
+    <footer class="bg-industrial-900 border-t border-gray-800 py-3 px-6 text-center text-xs text-gray-500 mt-auto">
+        MechaLingua HMI v5.5 - Technical English CALL &amp; Paraphrase Writing Evaluator for Mechanical Engineering
+    </footer>
+
+    <!-- JAVASCRIPT ENGINE -->
     <script>
         const faultDatabase = {
             thermal: {
                 code: "ERR-THM-01", sensorName: "Primary Drive Shaft Temperature (°C)", shortMetric: "Shaft Temp", unit: "°C", normalBase: 55, faultSpike: 118,
-                localSop: "<strong>Bahasa Bengkel:</strong> As utama <em>overheat</em>.<br><strong>SOP:</strong> Kurangi beban putaran, cek <em>cooling fan</em>.",
+                localSop: "<strong>Bahasa Bengkel:</strong> As utama <em>overheat</em> (kepanasan parah).<br><strong>SOP Mekanik:</strong> Kurangi beban putaran mesin, periksa kipas pendingin (<em>cooling fan/blower</em>), dan cek sirkulasi oli pelumas.",
+                symptomKeywords: ["thermal", "heat", "overheating", "overheated", "temperature", "hot", "overload", "warm"],
+                componentKeywords: ["shaft", "spindle", "axle", "rotor", "motor", "drive", "bearing", "housing"],
+                synonymChips: ["Excessive heat", "High temperature", "Overheating", "Main motor spindle", "Rotor axle", "is sensed", "has been recorded", "must be cooled down", "inspect cooling fan"],
+                sampleParaphrases: [
+                    "CAUTION: High temperature is sensed on the main rotor axle. Machine must be cooled down immediately.",
+                    "ALERT: Severe overheating has been recorded in the motor drive spindle. Check cooling fan."
+                ],
+                errorSample: "WARNING: High temperature is detect on main rotor axle. Machine must cooled down.",
                 variations: [
                     {
                         label: "V1: HMI", englishText: "WARNING: Critical Thermal Overload Detected on Primary Drive Shaft.",
@@ -345,11 +444,23 @@
                         ]
                     }
                 ],
-                vocabList: [{ word: "Thermal Overload", pos: "Compound Noun", meaning: "Excessive heat load", synonyms: "Excessive Heat, Overheating" }]
+                vocabList: [
+                    { word: "Thermal Overload", pos: "Compound Noun", meaning: "Excessive heat load", synonyms: "Excessive Heat, Overheating, High Temperature" },
+                    { word: "Primary Drive Shaft", pos: "Compound Noun", meaning: "Main rotating shaft", synonyms: "Main Motor Spindle, Rotor Axle" },
+                    { word: "Detected", pos: "Past Participle (V3)", meaning: "Read by sensor", synonyms: "is sensed, is observed, has been recorded" }
+                ]
             },
             lube_oil: {
                 code: "ERR-LUB-02", sensorName: "Gearbox Oil Sump Level (%)", shortMetric: "Oil Level", unit: "%", normalBase: 82, faultSpike: 12,
-                localSop: "<strong>Bahasa Bengkel:</strong> Oli gearbox tekor.<br><strong>SOP:</strong> Cek <em>sight glass</em>, tambah oli SAE standar.",
+                localSop: "<strong>Bahasa Bengkel:</strong> Oli gearbox tekor/kering di bak karter.<br><strong>SOP Mekanik:</strong> Cek <em>sight glass</em>, periksa kebocoran <em>oil seal</em>, tambah oli SAE standar.",
+                symptomKeywords: ["oil", "lubricant", "lubrication", "lube", "grease", "fluid", "depleted", "low", "insufficient", "empty"],
+                componentKeywords: ["gearbox", "sump", "reservoir", "tank", "pan", "transmission", "crankcase", "level", "volume"],
+                synonymChips: ["Insufficient lubricant", "Low oil volume", "Transmission reservoir", "Oil pan", "is sensed", "has been depleted", "should be replenished", "refill oil immediately"],
+                sampleParaphrases: [
+                    "ALERT: Low lubricant volume is observed in the gearbox oil pan. Oil should be replenished immediately.",
+                    "FAULT: Insufficient gear oil has been detected in the transmission tank. Refill lubricant now."
+                ],
+                errorSample: "WARNING: Low oil volume is detect in gearbox tank. Lubricant must refilled.",
                 variations: [
                     {
                         label: "V1: HMI", englishText: "WARNING: Critically Low Lubrication Oil Level is Detected in Gearbox Sump.",
@@ -383,11 +494,23 @@
                         ]
                     }
                 ],
-                vocabList: [{ word: "Lubrication Oil", pos: "Compound Noun", meaning: "Machine lube oil", synonyms: "Lubricant, Gear Oil" }]
+                vocabList: [
+                    { word: "Lubrication Oil", pos: "Compound Noun", meaning: "Machine lube oil", synonyms: "Lubricant, Gear Oil, Lube Fluid" },
+                    { word: "Gearbox Sump", pos: "Compound Noun", meaning: "Lower oil pan", synonyms: "Transmission Reservoir, Oil Pan, Tank" },
+                    { word: "Must Be Refilled", pos: "Modal Passive", meaning: "Mandatory refill", synonyms: "Should Be Replenished, Top Up Immediately" }
+                ]
             },
             hydraulic: {
                 code: "ERR-HYD-03", sensorName: "Hydraulic Line Pressure (Bar)", shortMetric: "Hyd. Pressure", unit: "Bar", normalBase: 145, faultSpike: 32,
-                localSop: "<strong>Bahasa Bengkel:</strong> Tekanan oli hidrolik ngedrop.<br><strong>SOP:</strong> Cek kebocoran selang hidrolik.",
+                localSop: "<strong>Bahasa Bengkel:</strong> Tekanan oli hidrolik ngedrop.<br><strong>SOP Mekanik:</strong> Cek kebocoran selang hidrolik (<em>hose</em>) dan katup <em>relief valve</em>.",
+                symptomKeywords: ["pressure", "hydraulic", "drop", "loss", "low", "insufficient", "substandard", "depressurized"],
+                componentKeywords: ["valve", "actuator", "manifold", "pump", "line", "cylinder", "hose", "system"],
+                synonymChips: ["Low hydraulic pressure", "Pressure loss", "Control valve", "Hydraulic manifold", "is observed", "has been recorded", "pump must be checked", "system is halted"],
+                sampleParaphrases: [
+                    "WARNING: Severe hydraulic pressure loss is observed in the control valve. System is halted.",
+                    "FAULT: Low fluid pressure has been sensed in the hydraulic line. Pump should be checked."
+                ],
+                errorSample: "FAULT: Low hydraulic pressure is detect in control valve. Pump must inspected.",
                 variations: [
                     {
                         label: "V1: HMI", englishText: "FAULT: Insufficient Hydraulic Pressure is Detected in Main Actuator Valve.",
@@ -420,11 +543,22 @@
                         ]
                     }
                 ],
-                vocabList: [{ word: "Pressure Drop", pos: "Compound Noun", meaning: "Pressure loss", synonyms: "Depressurization" }]
+                vocabList: [
+                    { word: "Insufficient Pressure", pos: "Adj + Noun", meaning: "Below target bar", synonyms: "Pressure Drop, Substandard Pressure, Low Pressure" },
+                    { word: "Actuator Valve", pos: "Compound Noun", meaning: "Hydraulic valve", synonyms: "Control Valve, Hydraulic Manifold, Solenoid" }
+                ]
             },
             pneumatic: {
                 code: "ERR-PNE-04", sensorName: "Pneumatic Air Supply (Bar)", shortMetric: "Air Pressure", unit: "Bar", normalBase: 6.8, faultSpike: 1.4,
-                localSop: "<strong>Bahasa Bengkel:</strong> Angin kompresor bocor.<br><strong>SOP:</strong> Cek selang PU dan regulator angin.",
+                localSop: "<strong>Bahasa Bengkel:</strong> Angin kompresor bocor/tekor.<br><strong>SOP Mekanik:</strong> Cek selang PU dan regulator filter angin.",
+                symptomKeywords: ["air", "pneumatic", "compressed", "pressure", "leak", "leakage", "lost", "depressurized", "low", "inadequate"],
+                componentKeywords: ["cylinder", "line", "valve", "solenoid", "brake", "actuator", "hose", "supply", "compressor"],
+                synonymChips: ["Pneumatic air leak", "Low air pressure", "Air actuator", "Supply line", "is sensed", "has been lost", "safety brake is locked", "check air hose"],
+                sampleParaphrases: [
+                    "ALARM: Low compressed air pressure is sensed in the air actuator. Safety brake is locked.",
+                    "WARNING: Air leakage has been detected in the pneumatic supply hose. Check compressor line."
+                ],
+                errorSample: "ALARM: Compressed air pressure was lose in pneumatic cylinder. Brake is lock.",
                 variations: [
                     {
                         label: "V1: HMI", englishText: "ALARM: Compressed Air Pressure Was Lost in Pneumatic Cylinder.",
@@ -457,11 +591,22 @@
                         ]
                     }
                 ],
-                vocabList: [{ word: "Compressed Air", pos: "Compound Noun", meaning: "Pressurized air", synonyms: "Pneumatic Supply" }]
+                vocabList: [
+                    { word: "Compressed Air", pos: "Compound Noun", meaning: "Pressurized air", synonyms: "Pneumatic Supply, Air Pressure" },
+                    { word: "Pneumatic Cylinder", pos: "Compound Noun", meaning: "Air piston", synonyms: "Air Actuator, Solenoid Valve, Supply Line" }
+                ]
             },
             jamming: {
                 code: "ERR-MEC-05", sensorName: "Motor Torque Load (%)", shortMetric: "Motor Torque", unit: "%", normalBase: 48, faultSpike: 148,
-                localSop: "<strong>Bahasa Bengkel:</strong> Konveyor macet nyangkut.<br><strong>SOP:</strong> Matikan mesin, bersihkan ganjalan.",
+                localSop: "<strong>Bahasa Bengkel:</strong> Konveyor macet/nyangkut.<br><strong>SOP Mekanik:</strong> Matikan mesin (LOTO), singkirkan material yang mengganjal di roller.",
+                symptomKeywords: ["jamming", "jammed", "obstructed", "obstruction", "blocked", "blockage", "seized", "torque", "overload", "stopped", "halted"],
+                componentKeywords: ["conveyor", "belt", "roller", "motor", "drive", "mechanism", "pulley", "line"],
+                synonymChips: ["Conveyor belt", "Drive roller", "Physical obstruction", "Torque overload", "is blocked", "has been halted", "must be cleared", "remove foreign object"],
+                sampleParaphrases: [
+                    "FAULT: Main conveyor belt has been halted due to physical obstruction. Remove debris immediately.",
+                    "ALERT: High motor torque is sensed on the drive roller. Jammed mechanism must be cleared."
+                ],
+                errorSample: "ALERT: Conveyor belt has been stop due to mechanical jamming. Roller is block.",
                 variations: [
                     {
                         label: "V1: HMI", englishText: "ALERT: Secondary Conveyor Belt Has Been Stopped Due to Mechanical Jamming.",
@@ -494,11 +639,22 @@
                         ]
                     }
                 ],
-                vocabList: [{ word: "Mechanical Jamming", pos: "Adj + Gerund", meaning: "Physical blockage", synonyms: "Obstruction, Seizure" }]
+                vocabList: [
+                    { word: "Mechanical Jamming", pos: "Adj + Gerund", meaning: "Physical blockage", synonyms: "Physical Obstruction, Seized Mechanism, Blockage" },
+                    { word: "Has Been Stopped", pos: "Present Perfect Passive", meaning: "Halted automatically", synonyms: "Has Been Halted, is Obstructed, is Blocked" }
+                ]
             },
             vibration: {
                 code: "ERR-VIB-06", sensorName: "Spindle Vibration (mm/s)", shortMetric: "Vibration", unit: "mm/s", normalBase: 1.6, faultSpike: 14.5,
-                localSop: "<strong>Bahasa Bengkel:</strong> Laher spindel oblak.<br><strong>SOP:</strong> Ganti <em>bearing</em> baru.",
+                localSop: "<strong>Bahasa Bengkel:</strong> Laher spindel oblak/aus.<br><strong>SOP Mekanik:</strong> Bongkar <em>bearing housing</em> dan ganti laher baru.",
+                symptomKeywords: ["vibration", "oscillation", "shaking", "wear", "worn", "degraded", "damaged", "amplitude", "noise"],
+                componentKeywords: ["bearing", "spindle", "shaft", "rotor", "ball", "housing", "axle"],
+                synonymChips: ["Heavy vibration", "Abnormal oscillation", "Damaged ball bearing", "Worn shaft bearing", "is sensed", "has been recorded", "must be replaced", "change worn bearing"],
+                sampleParaphrases: [
+                    "WARNING: Heavy vibration is observed on the main spindle. Damaged ball bearing must be replaced.",
+                    "DANGER: Abnormal oscillation has been detected in the rotor housing. Change worn bearing immediately."
+                ],
+                errorSample: "DANGER: Heavy vibration is detect on spindle. Worn bearing must replace.",
                 variations: [
                     {
                         label: "V1: HMI", englishText: "DANGER: Excessive Vibration is Detected. Replace Worn Spindle Bearing Immediately.",
@@ -532,11 +688,22 @@
                         ]
                     }
                 ],
-                vocabList: [{ word: "Worn Bearing", pos: "Adj + Noun", meaning: "Damaged rotary bearing", synonyms: "Degraded Bearing" }]
+                vocabList: [
+                    { word: "Excessive Vibration", pos: "Adj + Noun", meaning: "High shaking", synonyms: "Abnormal Oscillation, Heavy Vibration" },
+                    { word: "Worn Spindle Bearing", pos: "Compound Noun", meaning: "Degraded bearing", synonyms: "Damaged Ball Bearing, Degraded Bearing" }
+                ]
             },
             coolant: {
                 code: "ERR-CLN-07", sensorName: "Coolant Flow Rate (L/m)", shortMetric: "Coolant Flow", unit: "L/m", normalBase: 32.0, faultSpike: 4.5,
-                localSop: "<strong>Bahasa Bengkel:</strong> Air coolant mampet.<br><strong>SOP:</strong> Bersihkan saringan filter.",
+                localSop: "<strong>Bahasa Bengkel:</strong> Air radiator/coolant mampet karena saringan kotor.<br><strong>SOP Mekanik:</strong> Bersihkan kasa filter pendingin.",
+                symptomKeywords: ["coolant", "cooling", "flow", "circulation", "discharge", "liquid", "restricted", "blocked", "clogged", "low"],
+                componentKeywords: ["filter", "strainer", "mesh", "pump", "exchanger", "radiator", "pipe", "line"],
+                synonymChips: ["Low coolant flow", "Cooling circulation", "Blocked strainer", "Dirty filter mesh", "is blocked", "has been restricted", "must be cleaned", "flush cooling filter"],
+                sampleParaphrases: [
+                    "WARNING: Cooling liquid flow is blocked by a dirty strainer. Filter mesh must be cleaned.",
+                    "FAULT: Low coolant circulation has been sensed in the radiator pipe. Flush clogged filter."
+                ],
+                errorSample: "CAUTION: Coolant flow is block by dirty filter. Strainer must cleaned.",
                 variations: [
                     {
                         label: "V1: HMI", englishText: "CAUTION: Coolant Flow is Restricted by Clogged Filter. Cooling Pump is Being Shut Down.",
@@ -569,18 +736,29 @@
                         ]
                     }
                 ],
-                vocabList: [{ word: "Clogged Filter", pos: "Adj + Noun", meaning: "Blocked strainer", synonyms: "Fouled Mesh" }]
+                vocabList: [
+                    { word: "Coolant Flow", pos: "Compound Noun", meaning: "Cooling liquid stream", synonyms: "Cooling Circulation, Coolant Discharge" },
+                    { word: "Clogged Filter", pos: "Adj + Noun", meaning: "Blocked strainer", synonyms: "Dirty Strainer Mesh, Blocked Screen" }
+                ]
             },
             misalignment: {
                 code: "ERR-ALN-08", sensorName: "Coupling Deviation (mm)", shortMetric: "Misalignment", unit: "mm", normalBase: 0.02, faultSpike: 0.48,
-                localSop: "<strong>Bahasa Bengkel:</strong> Kopling motor tidak senter.<br><strong>SOP:</strong> Setel ulang kelurusan poros.",
+                localSop: "<strong>Bahasa Bengkel:</strong> Kopling motor tidak senter/miring.<br><strong>SOP Mekanik:</strong> Setel ulang kelurusan poros (<em>alignment</em>).",
+                symptomKeywords: ["misalignment", "runout", "offset", "deviation", "uncentered", "crooked", "angular", "alignment"],
+                componentKeywords: ["shaft", "coupling", "motor", "axle", "rotor", "flange", "drive"],
+                synonymChips: ["Shaft runout", "Coupling offset", "Axis deviation", "Flexible coupling", "is measured", "has been sensed", "must be realigned", "perform laser alignment"],
+                sampleParaphrases: [
+                    "WARNING: High shaft runout is sensed on the motor flange. Coupling must be realigned.",
+                    "FAULT: Severe coupling offset has been measured on the rotor shaft. Perform laser alignment."
+                ],
+                errorSample: "FAULT: High shaft runout is detect on motor coupling. Shaft should realigned.",
                 variations: [
                     {
                         label: "V1: HMI", englishText: "FAULT: Severe Angular Misalignment is Detected on Motor Coupling. Drive Shaft Should Be Realigned.",
                         translation: "Kesalahan: Ketidaksejajaran Sudut Terdeteksi di Kopling Motor. Poros Harus Disenter Ulang.",
                         formulaDesc: "[Compound Noun + Present Passive] + [Modal Passive: Should + Be + V3]",
                         fullBreakdown: [
-                            { word: "Severe Angular Misalignment", pos: "Compound Noun", formula: "Adj + Adj + Noun (Prefix Mis-)", func: " crooked shaft angle." },
+                            { word: "Severe Angular Misalignment", pos: "Compound Noun", formula: "Adj + Adj + Noun (Prefix Mis-)", func: "Crooked shaft angle." },
                             { word: "is Detected", pos: "Present Passive", formula: "Is + Detected (V3)", func: "Sensed by proximity probe." },
                             { word: "Drive Shaft Should Be Realigned", pos: "Modal Passive", formula: "Should + be + Realigned (V3)", func: "Recommended alignment SOP." }
                         ]
@@ -606,13 +784,17 @@
                         ]
                     }
                 ],
-                vocabList: [{ word: "Angular Misalignment", pos: "Compound Noun", meaning: "Uncentered shaft angle", synonyms: "Shaft Runout, Offset" }]
+                vocabList: [
+                    { word: "Angular Misalignment", pos: "Compound Noun", meaning: "Uncentered shaft angle", synonyms: "Shaft Runout, Coupling Offset, Axis Deviation" },
+                    { word: "Should Be Realigned", pos: "Modal Passive", meaning: "Re-center shaft", synonyms: "Must Be Centered, Perform Laser Alignment" }
+                ]
             }
         };
 
         let currentScenarioKey = null, currentVariationIndex = 0, isSimulationRunning = false, chartInstance = null;
-        let quizScore = 0, selectedQuizWords = [], currentQuizWords = [];
+        let writingScore = 0, sampleParaphraseToggle = 0;
 
+        // LAZY CHART INITIALIZATION (Prevents hidden canvas crash)
         function ensureChartReady() {
             if (chartInstance) return;
             if (typeof Chart === 'undefined') return;
@@ -634,9 +816,10 @@
             arr.shift();
             const targetVal = isSimulationRunning ? sc.faultSpike : sc.normalBase;
             const noise = (Math.random() - 0.5) * (targetVal * 0.03);
-            arr.push(+(targetVal + noise).toFixed(1));
+            const liveVal = +(targetVal + noise).toFixed(1);
+            arr.push(liveVal);
             chartInstance.update('none');
-            document.getElementById('telemetry-live-val').textContent = `${sc.shortMetric}: ${+(targetVal + noise).toFixed(1)} ${sc.unit}`;
+            document.getElementById('telemetry-live-val').textContent = `${sc.shortMetric}: ${liveVal} ${sc.unit}`;
         }, 1200);
 
         function selectScenario(key) {
@@ -655,7 +838,7 @@
 
             resetFailureSimulation();
             renderContent();
-            setupQuizForCurrentScenario();
+            setupWritingModule();
             openModule('fullBreakdown');
         }
 
@@ -671,6 +854,8 @@
             if (chartInstance) {
                 chartInstance.data.datasets[0].borderColor = '#ef4444';
                 chartInstance.data.datasets[0].backgroundColor = 'rgba(239, 68, 68, 0.15)';
+                const b = sc.normalBase, s = sc.faultSpike;
+                chartInstance.data.datasets[0].data = [b, b, b, b, b, +(b+(s-b)*0.5).toFixed(1), +(b+(s-b)*0.85).toFixed(1), s, s, s, s, s, s, s, s];
                 chartInstance.update();
             }
         }
@@ -681,7 +866,7 @@
             const sc = faultDatabase[currentScenarioKey];
             document.getElementById('system-status-badge').className = "flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 px-3 py-1.5 rounded-full text-xs font-mono-tech font-semibold";
             document.getElementById('status-text').textContent = `SYSTEM NORMAL // ${sc.code}`;
-            document.getElementById('sim-status-indicator').textContent = "STATUS: NORMAL RUNNING (Click 'Start Failure' to project fault)";
+            document.getElementById('sim-status-indicator').textContent = "STATUS: NORMAL RUNNING (Click 'Start Failure' to project fault spike)";
             document.getElementById('sim-status-indicator').className = "text-xs font-mono-tech font-bold text-emerald-400";
             if (chartInstance) {
                 chartInstance.data.datasets[0].borderColor = '#10b981';
@@ -694,6 +879,7 @@
         function switchVariation(idx) {
             currentVariationIndex = idx;
             renderContent();
+            setupWritingModule();
         }
 
         function renderContent() {
@@ -733,7 +919,7 @@
                     <td class="py-2 px-3 font-bold text-white">${w.word}</td>
                     <td class="py-2 px-3 text-amber-300">${w.pos}</td>
                     <td class="py-2 px-3 text-gray-300">${w.meaning}</td>
-                    <td class="py-2 px-3 text-emerald-400">${w.synonyms}</td>
+                    <td class="py-2 px-3 text-emerald-400 font-mono-tech">${w.synonyms}</td>
                     <td class="py-2 px-3 text-center"><button type="button" onclick="speakText('${w.word}')" class="text-amber-400"><i class="fa-solid fa-volume-low"></i></button></td>
                 </tr>
             `).join('');
@@ -748,63 +934,272 @@
             document.getElementById('telemetry-live-val').textContent = `${sc.shortMetric}: ${isSimulationRunning ? sc.faultSpike : sc.normalBase} ${sc.unit}`;
         }
 
-        function setupQuizForCurrentScenario() {
+        // ============================================================================
+        // MODULE 5: FREE-TYPING PARAPHRASE & GRAMMAR CHECKER ENGINE
+        // ============================================================================
+        function setupWritingModule() {
             if (!currentScenarioKey) return;
-            const v = faultDatabase[currentScenarioKey].variations[0];
-            document.getElementById('quiz-target-meaning').textContent = `Target Meaning: "${v.translation}"`;
-            document.getElementById('quiz-grammar-hint').textContent = `Formula Hint: ${v.formulaDesc}`;
-            currentQuizWords = v.englishText.replace(/[.:]/g, '').split(' ');
-            selectedQuizWords = [];
-            updateQuizUI();
-        }
+            const sc = faultDatabase[currentScenarioKey];
+            const v = sc.variations[currentVariationIndex];
 
-        function updateQuizUI() {
-            const dropzone = document.getElementById('quiz-answer-dropzone');
-            const wordBank = document.getElementById('quiz-word-bank');
-            if (selectedQuizWords.length === 0) {
-                dropzone.innerHTML = `<span class="text-xs text-gray-500 italic">Click word blocks below in the correct order to build the alarm sentence...</span>`;
-            } else {
-                dropzone.innerHTML = selectedQuizWords.map((item, idx) => `
-                    <button type="button" onclick="removeQuizWord(${idx})" class="bg-amber-500 text-gray-950 font-bold font-mono-tech text-xs px-2.5 py-1.5 rounded flex items-center gap-1">
-                        ${item.word} <i class="fa-solid fa-xmark text-[10px]"></i>
-                    </button>
-                `).join('');
-            }
-            const available = currentQuizWords.map((w, i) => ({word: w, id: i})).filter(item => !selectedQuizWords.some(s => s.id === item.id));
-            wordBank.innerHTML = available.map(item => `
-                <button type="button" onclick="addQuizWord('${item.word.replace(/'/g, "")}', ${item.id})" class="bg-industrial-900 hover:bg-gray-700 text-gray-200 border border-gray-700 font-mono-tech text-xs px-3 py-1.5 rounded">
-                    ${item.word}
+            document.getElementById('write-ref-english').textContent = `"${v.englishText}"`;
+            document.getElementById('write-ref-meaning').textContent = `"${v.translation}"`;
+
+            const chipsContainer = document.getElementById('write-synonym-chips');
+            chipsContainer.innerHTML = sc.synonymChips.map(chip => `
+                <button type="button" onclick="insertSynonymChip('${chip}')" class="text-[11px] font-mono-tech bg-industrial-800 hover:bg-amber-500 hover:text-gray-950 text-emerald-300 border border-gray-700 px-2 py-1 rounded transition">
+                    + ${chip}
                 </button>
             `).join('');
-            document.getElementById('quiz-score-display').textContent = `Score: ${quizScore}`;
+
+            document.getElementById('user-sentence-input').value = "";
+            document.getElementById('writing-evaluation-box').classList.add('hidden');
+            updateLiveSimilarity();
         }
 
-        function addQuizWord(word, id) { selectedQuizWords.push({word, id}); updateQuizUI(); }
-        function removeQuizWord(index) { selectedQuizWords.splice(index, 1); updateQuizUI(); }
-        function clearQuizSelection() { selectedQuizWords = []; updateQuizUI(); document.getElementById('quiz-feedback-msg').textContent = ""; }
+        function insertSynonymChip(text) {
+            const input = document.getElementById('user-sentence-input');
+            const cur = input.value.trim();
+            input.value = cur ? cur + " " + text : text;
+            input.focus();
+            updateLiveSimilarity();
+        }
 
-        function checkQuizAnswer() {
+        function clearUserSentence() {
+            document.getElementById('user-sentence-input').value = "";
+            document.getElementById('writing-evaluation-box').classList.add('hidden');
+            updateLiveSimilarity();
+        }
+
+        function fillSampleParaphrase() {
             if (!currentScenarioKey) return;
-            const targetString = faultDatabase[currentScenarioKey].variations[0].englishText.replace(/[.:]/g, '').split(' ').join(' ');
-            const userString = selectedQuizWords.map(s => s.word).join(' ');
-            const fb = document.getElementById('quiz-feedback-msg');
-            if (userString === targetString) {
-                fb.textContent = "CORRECT! Excellent Technical English!";
-                fb.className = "text-xs font-bold text-emerald-400";
-                quizScore += 10;
-                updateQuizUI();
-                speakText(targetString);
+            const sc = faultDatabase[currentScenarioKey];
+            const sample = sc.sampleParaphrases[sampleParaphraseToggle % sc.sampleParaphrases.length];
+            sampleParaphraseToggle++;
+            document.getElementById('user-sentence-input').value = sample;
+            updateLiveSimilarity();
+            evaluateUserSentence();
+        }
+
+        function fillIntentionalErrorSample() {
+            if (!currentScenarioKey) return;
+            const sc = faultDatabase[currentScenarioKey];
+            document.getElementById('user-sentence-input').value = sc.errorSample;
+            updateLiveSimilarity();
+            evaluateUserSentence();
+        }
+
+        // Tokenize and calculate word overlap similarity against all 3 reference variations
+        function tokenizeWords(str) {
+            return str.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(Boolean);
+        }
+
+        function calculateMaxSimilarity(userStr) {
+            if (!currentScenarioKey) return { maxSim: 0, matchedVarLabel: "V1" };
+            const userWords = tokenizeWords(userStr);
+            if (userWords.length === 0) return { maxSim: 0, matchedVarLabel: "V1" };
+
+            const sc = faultDatabase[currentScenarioKey];
+            let maxSim = 0;
+            let matchedVarLabel = sc.variations[0].label;
+
+            sc.variations.forEach(v => {
+                const refWords = tokenizeWords(v.englishText);
+                const matches = userWords.filter(w => refWords.includes(w)).length;
+                const ratio = Math.round((matches / Math.max(userWords.length, refWords.length)) * 100);
+                if (ratio > maxSim) {
+                    maxSim = ratio;
+                    matchedVarLabel = v.label;
+                }
+            });
+
+            return { maxSim, matchedVarLabel };
+        }
+
+        function updateLiveSimilarity() {
+            const val = document.getElementById('user-sentence-input').value;
+            const { maxSim, matchedVarLabel } = calculateMaxSimilarity(val);
+            const badge = document.getElementById('similarity-live-badge');
+
+            if (maxSim >= 75) {
+                badge.textContent = `Similarity to ${matchedVarLabel}: ${maxSim}% (TOO SIMILAR - Paraphrase Required!)`;
+                badge.className = "text-[11px] font-mono-tech px-2 py-0.5 rounded bg-red-950 text-red-400 border border-red-600 font-bold";
+            } else if (maxSim >= 30) {
+                badge.textContent = `Similarity to ${matchedVarLabel}: ${maxSim}% (Good Paraphrase Range)`;
+                badge.className = "text-[11px] font-mono-tech px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-600 font-bold";
             } else {
-                fb.textContent = "Incorrect word order. Try again!";
-                fb.className = "text-xs font-bold text-red-400";
+                badge.textContent = `Similarity: ${maxSim}%`;
+                badge.className = "text-[11px] font-mono-tech px-2 py-0.5 rounded bg-gray-900 text-gray-400 border border-gray-700";
             }
         }
 
-        function nextQuizQuestion() {
-            const keys = Object.keys(faultDatabase);
-            selectScenario(keys[(keys.indexOf(currentScenarioKey) + 1) % keys.length]);
-            openModule('practice');
-            document.getElementById('quiz-feedback-msg').textContent = "";
+        // Core Grammar & ESP Paraphrase Evaluator
+        function evaluateUserSentence() {
+            if (!currentScenarioKey) return;
+            const rawInput = document.getElementById('user-sentence-input').value.trim();
+            const evalBox = document.getElementById('writing-evaluation-box');
+            const sc = faultDatabase[currentScenarioKey];
+
+            if (rawInput.length < 10) {
+                evalBox.className = "mt-4 rounded-xl border border-amber-500 bg-amber-950/40 p-4 text-xs text-amber-200 fade-in";
+                evalBox.innerHTML = `<div class="font-bold"><i class="fa-solid fa-circle-exclamation mr-1"></i> Sentence Too Short:</div><p class="mt-1">Please write a complete industrial fault warning sentence (at least 4 words).</p>`;
+                evalBox.classList.remove('hidden');
+                return;
+            }
+
+            const { maxSim, matchedVarLabel } = calculateMaxSimilarity(rawInput);
+
+            // 1. ANTI-COPY CHECK (>= 75% word similarity rejected)
+            if (maxSim >= 75) {
+                evalBox.className = "mt-4 rounded-xl border-2 border-red-500 bg-red-950/40 p-4 text-xs text-red-200 fade-in space-y-2";
+                evalBox.innerHTML = `
+                    <div class="text-sm font-bold text-red-400 flex items-center gap-2">
+                        <i class="fa-solid fa-copy"></i> Rejected: Too Similar to Reference Sentence (${maxSim}% Match with ${matchedVarLabel})!
+                    </div>
+                    <p>Your sentence is almost identical to the built-in example. In this exercise, you must <strong>paraphrase</strong> (write your own version using different technical synonyms or sentence structure).</p>
+                    <div class="bg-black/60 p-3 rounded-lg border border-red-500/40 font-mono-tech">
+                        <div class="text-amber-300 font-bold mb-1">How to fix it:</div>
+                        <ul class="list-disc list-inside space-y-1 text-gray-300">
+                            <li>Replace the component or symptom words using the <strong>Recommended Synonyms</strong> above (e.g., use <em>${sc.synonymChips.slice(0, 3).join(', ')}</em>).</li>
+                            <li>Or change the passive structure (e.g., change <code>is detected</code> to <code>has been sensed</code> or add a Modal Passive SOP like <code>must be inspected</code>).</li>
+                        </ul>
+                    </div>
+                `;
+                evalBox.classList.remove('hidden');
+                return;
+            }
+
+            // 2. GRAMMAR & COMMON MECHANIC ERROR DETECTION (Passive Voice / Modal Passive)
+            let correctedSentence = rawInput;
+            const grammarErrors = [];
+
+            // Detect "is/are/was/were/been/be + Verb-1" instead of Verb-3 (Past Participle)
+            const v1ToV3Map = [
+                { wrong: /\b(is|are|was|were|been|be)\s+detect\b/gi, right: "$1 detected", explanation: "After auxiliary verb <code>is/was/been/be</code>, Passive Voice requires <strong>Past Participle (Verb-3)</strong>: change <code>detect</code> &rarr; <code>detected</code>." },
+                { wrong: /\b(is|are|was|were|been|be)\s+sense\b/gi, right: "$1 sensed", explanation: "Passive Voice requires <strong>Verb-3</strong>: change <code>sense</code> &rarr; <code>sensed</code>." },
+                { wrong: /\b(is|are|was|were|been|be)\s+observe\b/gi, right: "$1 observed", explanation: "Passive Voice requires <strong>Verb-3</strong>: change <code>observe</code> &rarr; <code>observed</code>." },
+                { wrong: /\b(is|are|was|were|been|be)\s+record\b/gi, right: "$1 recorded", explanation: "Passive Voice requires <strong>Verb-3</strong>: change <code>record</code> &rarr; <code>recorded</code>." },
+                { wrong: /\b(is|are|was|were|been|be)\s+stop\b/gi, right: "$1 stopped", explanation: "Passive Voice requires <strong>Verb-3</strong>: change <code>stop</code> &rarr; <code>stopped</code>." },
+                { wrong: /\b(is|are|was|were|been|be)\s+block\b/gi, right: "$1 blocked", explanation: "Passive Voice requires <strong>Verb-3</strong>: change <code>block</code> &rarr; <code>blocked</code>." },
+                { wrong: /\b(is|are|was|were|been|be)\s+restrict\b/gi, right: "$1 restricted", explanation: "Passive Voice requires <strong>Verb-3</strong>: change <code>restrict</code> &rarr; <code>restricted</code>." },
+                { wrong: /\b(is|are|was|were|been|be)\s+obstruct\b/gi, right: "$1 obstructed", explanation: "Passive Voice requires <strong>Verb-3</strong>: change <code>obstruct</code> &rarr; <code>obstructed</code>." },
+                { wrong: /\b(is|are|was|were|been|be)\s+lose\b/gi, right: "$1 lost", explanation: "Irregular Verb-3 of <em>lose</em> is <strong>lost</strong>: change <code>lose</code> &rarr; <code>lost</code>." },
+                { wrong: /\b(is|are|was|were|been|be)\s+lock\b/gi, right: "$1 locked", explanation: "Passive Voice requires <strong>Verb-3</strong>: change <code>lock</code> &rarr; <code>locked</code>." },
+                { wrong: /\b(is|are|was|were|been|be)\s+replace\b/gi, right: "$1 replaced", explanation: "Passive Voice requires <strong>Verb-3</strong>: change <code>replace</code> &rarr; <code>replaced</code>." },
+                { wrong: /\b(is|are|was|were|been|be)\s+clean\b/gi, right: "$1 cleaned", explanation: "Passive Voice requires <strong>Verb-3</strong>: change <code>clean</code> &rarr; <code>cleaned</code>." },
+                { wrong: /\b(is|are|was|were|been|be)\s+inspect\b/gi, right: "$1 inspected", explanation: "Passive Voice requires <strong>Verb-3</strong>: change <code>inspect</code> &rarr; <code>inspected</code>." },
+                { wrong: /\b(is|are|was|were|been|be)\s+check\b/gi, right: "$1 checked", explanation: "Passive Voice requires <strong>Verb-3</strong>: change <code>check</code> &rarr; <code>checked</code>." },
+                { wrong: /\b(is|are|was|were|been|be)\s+refill\b/gi, right: "$1 refilled", explanation: "Passive Voice requires <strong>Verb-3</strong>: change <code>refill</code> &rarr; <code>refilled</code>." },
+                { wrong: /\b(is|are|was|were|been|be)\s+realign\b/gi, right: "$1 realigned", explanation: "Passive Voice requires <strong>Verb-3</strong>: change <code>realign</code> &rarr; <code>realigned</code>." },
+                { wrong: /\b(is|are|was|were|been|be)\s+cool\b/gi, right: "$1 cooled", explanation: "Passive Voice requires <strong>Verb-3</strong>: change <code>cool</code> &rarr; <code>cooled</code>." },
+                // Detect missing "be" after modal (e.g. "must refilled" or "should replaced")
+                { wrong: /\b(must|should|can|will)\s+(detected|sensed|cooled|refilled|replenished|inspected|checked|stopped|halted|cleared|replaced|cleaned|realigned|performed|locked)\b/gi, right: "$1 be $2", explanation: "Modal Passive Formula requires <strong>'be'</strong> between the modal and Verb-3: use <code>$1 be + Verb-3</code>." },
+                // Detect "must/should + Verb-1" when subject is an inanimate machine part
+                { wrong: /\b(machine|lubricant|oil|pump|bearing|filter|strainer|shaft|coupling|roller|belt|brake|system)\s+(must|should)\s+(cool|refill|replenish|inspect|check|stop|halt|clear|replace|clean|realign)\b/gi, right: "$1 $2 be $3ed", explanation: "Since the subject is a machine component (inanimate object), it cannot perform the action itself. Use <strong>Modal Passive (must/should + be + Verb-3)</strong>." },
+                // Detect "has/have + V3" missing "been" in passive context
+                { wrong: /\b(has|have)\s+(detected|sensed|recorded|generated|depleted|stopped|halted|blocked|restricted|induced|measured)\b/gi, right: "$1 been $2", explanation: "Present Perfect Passive requires <strong>'been'</strong>: use <code>has/have + been + Verb-3</code>." }
+            ];
+
+            v1ToV3Map.forEach(rule => {
+                if (rule.wrong.test(correctedSentence)) {
+                    grammarErrors.push(rule.explanation);
+                    correctedSentence = correctedSentence.replace(rule.wrong, rule.right);
+                }
+            });
+
+            // 3. CHECK SCENARIO RELEVANCE (Symptom + Machine Component)
+            const tokens = tokenizeWords(correctedSentence);
+            const matchedSymptoms = sc.symptomKeywords.filter(k => tokens.includes(k));
+            const matchedComponents = sc.componentKeywords.filter(k => tokens.includes(k));
+
+            // 4. CHECK VALID ESP PASSIVE OR IMPERATIVE PATTERN
+            const passiveRegex = /\b(is|are|was|were|has been|have been|must be|should be|is being|are being)\s+[a-z]+(ed|en|t|wn|d)\b/i;
+            const reducedPassiveRegex = /\b(detected|sensed|observed|recorded|generated|depleted|stopped|halted|blocked|restricted|obstructed|lost|locked|disabled|suspended|triggered|induced|measured)\b/i;
+            const imperativeRegex = /\b(replace|check|inspect|clean|clear|remove|refill|top up|flush|perform|realign|stop|shut down|cool)\b/i;
+
+            const hasValidGrammarStructure = passiveRegex.test(correctedSentence) || reducedPassiveRegex.test(correctedSentence) || imperativeRegex.test(correctedSentence);
+
+            const contentIssues = [];
+            if (matchedSymptoms.length === 0) {
+                contentIssues.push(`Missing fault symptom keyword for this scenario (include terms like: <code>${sc.symptomKeywords.slice(0, 4).join(', ')}</code>).`);
+            }
+            if (matchedComponents.length === 0) {
+                contentIssues.push(`Missing machine component keyword (include terms like: <code>${sc.componentKeywords.slice(0, 4).join(', ')}</code>).`);
+            }
+            if (!hasValidGrammarStructure && grammarErrors.length === 0) {
+                contentIssues.push(`Missing standard ESP Verb Structure. Please use <strong>Passive Voice</strong> (e.g., <code>is sensed</code>, <code>has been blocked</code>, <code>must be checked</code>) or an <strong>Imperative SOP Verb</strong> (e.g., <code>Check...</code>, <code>Replace...</code>).`);
+            }
+
+            // RENDER EVALUATION FEEDBACK
+            evalBox.classList.remove('hidden');
+
+            if (grammarErrors.length === 0 && contentIssues.length === 0) {
+                writingScore++;
+                document.getElementById('writing-score').textContent = writingScore;
+                speakText(rawInput);
+
+                evalBox.className = "mt-4 rounded-xl border-2 border-emerald-500 bg-emerald-950/30 p-4 text-xs text-gray-200 fade-in space-y-2.5";
+                evalBox.innerHTML = `
+                    <div class="text-sm font-bold text-emerald-400 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-check text-base"></i> Excellent! Valid Technical English Paraphrase (${maxSim}% Similarity)
+                    </div>
+                    <p>Your custom warning sentence is <strong>original</strong>, accurately describes the <strong>${sc.code}</strong> scenario, and follows proper <strong>ESP Mechanical Engineering Grammar</strong>!</p>
+                    <div class="bg-black/70 p-3 rounded-lg border border-emerald-500/40 font-mono-tech space-y-1.5">
+                        <div><span class="text-gray-400">Your Approved Alert:</span> <strong class="text-white">"${rawInput}"</strong></div>
+                        <div class="flex flex-wrap gap-2 pt-1">
+                            <span class="bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded text-[11px]">Symptom Matched: ${matchedSymptoms.join(', ')}</span>
+                            <span class="bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded text-[11px]">Component Matched: ${matchedComponents.join(', ')}</span>
+                            <span class="bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded text-[11px]">Grammar: Valid ESP Passive / SOP</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                evalBox.className = "mt-4 rounded-xl border-2 border-amber-500 bg-amber-950/30 p-4 text-xs text-gray-200 fade-in space-y-3";
+                let html = `
+                    <div class="text-sm font-bold text-amber-400 flex items-center gap-2">
+                        <i class="fa-solid fa-wrench"></i> Grammar &amp; ESP Diagnostic Feedback:
+                    </div>
+                `;
+
+                if (grammarErrors.length > 0) {
+                    html += `
+                        <div class="bg-red-950/50 border border-red-500/50 rounded-lg p-3 space-y-1.5">
+                            <div class="font-bold text-red-300 uppercase text-[11px]"><i class="fa-solid fa-xmark mr-1"></i> Grammatical Errors Detected in Your Sentence:</div>
+                            <ul class="list-disc list-inside space-y-1 text-gray-200">
+                                ${grammarErrors.map(e => `<li>${e}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div class="bg-emerald-950/50 border border-emerald-500/50 rounded-lg p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                                <div class="text-[10px] font-mono-tech uppercase text-emerald-400 font-bold">Auto-Corrected Sentence Suggestion:</div>
+                                <div class="font-mono-tech font-bold text-white text-sm mt-0.5">"${correctedSentence}"</div>
+                            </div>
+                            <button type="button" onclick="applyAutoCorrection('${correctedSentence.replace(/'/g, "\\'")}')" class="shrink-0 bg-emerald-500 hover:bg-emerald-400 text-gray-950 font-bold text-xs px-3 py-1.5 rounded shadow">
+                                Apply Fix
+                            </button>
+                        </div>
+                    `;
+                }
+
+                if (contentIssues.length > 0) {
+                    html += `
+                        <div class="bg-industrial-900 border border-gray-700 rounded-lg p-3 space-y-1">
+                            <div class="font-bold text-amber-300 uppercase text-[11px]"><i class="fa-solid fa-clipboard-list mr-1"></i> Technical Content &amp; Structure Checklist:</div>
+                            <ul class="list-disc list-inside space-y-1 text-gray-300">
+                                ${contentIssues.map(c => `<li>${c}</li>`).join('')}
+                            </ul>
+                        </div>
+                    `;
+                }
+
+                evalBox.innerHTML = html;
+            }
+        }
+
+        function applyAutoCorrection(fixedText) {
+            document.getElementById('user-sentence-input').value = fixedText;
+            updateLiveSimilarity();
+            evaluateUserSentence();
         }
 
         function openModule(name) {
@@ -841,9 +1236,13 @@
         function speakText(txt) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
-                window.speechSynthesis.speak(new SpeechSynthesisUtterance(txt));
+                const u = new SpeechSynthesisUtterance(txt);
+                u.lang = 'en-US';
+                u.rate = 0.92;
+                window.speechSynthesis.speak(u);
             }
         }
+
         function speakCurrentFault() {
             if (currentScenarioKey) speakText(faultDatabase[currentScenarioKey].variations[currentVariationIndex].englishText);
         }

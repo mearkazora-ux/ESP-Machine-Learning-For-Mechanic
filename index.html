@@ -1,46 +1,27 @@
 <!DOCTYPE html>
-<html lang="id" class="dark">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MechaLingua HMI v4.0 - Full Sentence Grammatical & ESP Breakdown</title>
-    <!-- Tailwind CSS CDN -->
+    <title>MechaLingua HMI - Interactive Fault Simulator &amp; Technical English CALL</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Font Awesome CDN for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         tailwind.config = {
             darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        industrial: {
-                            950: '#070a12',
-                            900: '#0b0f19',
-                            800: '#111827',
-                            700: '#1f2937',
-                            accent: '#f59e0b',
-                            danger: '#ef4444',
-                            normal: '#10b981'
-                        }
-                    }
-                }
-            }
+            theme: { extend: { colors: { industrial: { 950: '#070a12', 900: '#0b0f19', 800: '#111827', 700: '#1f2937', accent: '#f59e0b', danger: '#ef4444', normal: '#10b981' } } } }
         }
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; }
         .font-mono-tech { font-family: 'JetBrains Mono', monospace; }
         .blink-warning { animation: blinker 1.2s linear infinite; }
         @keyframes blinker { 50% { opacity: 0.35; } }
         .fade-in { animation: fadeIn 0.25s ease-out forwards; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .title-glow { text-shadow: 0 0 25px rgba(245, 158, 11, 0.35); }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #111827; }
         ::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
@@ -48,227 +29,181 @@
 </head>
 <body class="bg-industrial-950 text-gray-100 min-h-screen flex flex-col">
 
-    <!-- Top Navigation / Clean HMI Header -->
-    <header class="bg-industrial-800/90 backdrop-blur border-b border-gray-800 px-6 py-3.5 sticky top-0 z-30 flex flex-wrap justify-between items-center shadow-md">
-        <div class="flex items-center space-x-3">
-            <div class="bg-amber-500 text-gray-950 p-2 rounded-lg font-bold text-lg flex items-center justify-center shadow">
-                <i class="fa-solid fa-gears"></i>
+    <header class="bg-gradient-to-r from-industrial-900 via-industrial-800 to-industrial-900 border-b-2 border-amber-500/50 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-[0_4px_30px_rgba(245,158,11,0.12)]">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div class="flex items-start sm:items-center space-x-3.5">
+                <div class="bg-gradient-to-br from-amber-400 to-amber-600 text-gray-950 p-3 rounded-xl font-extrabold text-2xl flex items-center justify-center shadow-[0_0_20px_rgba(245,158,11,0.5)] ring-2 ring-amber-300/50 shrink-0">
+                    <i class="fa-solid fa-gears"></i>
+                </div>
+                <div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-[10px] font-mono-tech uppercase tracking-widest bg-amber-500 text-gray-950 font-extrabold px-2 py-0.5 rounded shadow">ESP Mechanical Engineering</span>
+                        <span class="text-[10px] font-mono-tech uppercase tracking-wider bg-blue-500/20 text-blue-300 border border-blue-500/40 px-2 py-0.5 rounded">IoT HMI Simulator + CALL</span>
+                    </div>
+                    <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white mt-1 title-glow">
+                        <span class="bg-gradient-to-r from-white via-amber-200 to-amber-400 bg-clip-text text-transparent">MechaLingua HMI</span>
+                    </h1>
+                    <p class="text-xs sm:text-sm text-gray-300 font-medium mt-0.5">
+                        Interactive Web-Based Fault Simulator with <span class="text-amber-400 font-semibold underline decoration-amber-500/60 underline-offset-4">Technical English Breakdown &amp; Sentence Builder</span>
+                    </p>
+                </div>
             </div>
-            <div>
-                <h1 class="text-base sm:text-lg font-bold tracking-wider uppercase text-white flex items-center gap-2">
-                    MechaLingua <span class="text-[11px] bg-amber-500/20 text-amber-400 border border-amber-500/40 px-2 py-0.5 rounded font-mono-tech">HMI v4.0 (Full Breakdown)</span>
-                </h1>
-                <p class="text-[11px] text-gray-400">ESP Technical English: Full Word-by-Word Grammatical Parsing &amp; Formula</p>
+            <div class="flex items-center space-x-3 self-end md:self-center shrink-0">
+                <div id="system-status-badge" class="flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 px-3 py-1.5 rounded-full text-xs font-mono-tech font-semibold">
+                    <span id="status-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                    <span id="status-text">SYSTEM STANDBY // NORMAL</span>
+                </div>
+                <button onclick="resetToStandby()" class="bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs px-3.5 py-2 rounded-lg font-semibold transition flex items-center gap-1.5 border border-gray-700 shadow">
+                    <i class="fa-solid fa-power-off text-emerald-400"></i> Standby / Reset
+                </button>
             </div>
-        </div>
-
-        <div class="flex items-center space-x-3 mt-2 sm:mt-0">
-            <div id="system-status-badge" class="flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 px-3 py-1.5 rounded-full text-xs font-mono-tech font-semibold">
-                <span id="status-dot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                <span id="status-text">SYSTEM STANDBY // NORMAL</span>
-            </div>
-            <button onclick="resetToStandby()" class="bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1.5 border border-gray-700">
-                <i class="fa-solid fa-power-off text-emerald-400"></i> Standby / Reset
-            </button>
         </div>
     </header>
 
-    <!-- Main Container -->
     <main class="flex-1 p-4 sm:p-6 max-w-6xl w-full mx-auto flex flex-col gap-5">
 
-        <!-- STEP 1: COMPACT SCENARIO SELECTOR BAR (Always Visible) -->
         <section class="bg-industrial-800 border border-gray-800 rounded-xl p-4 shadow-lg">
-            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-                <h2 class="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-2">
-                    <i class="fa-solid fa-sliders"></i> Langkah 1: Pilih Skenario Kerusakan Mesin (Fault Trigger)
-                </h2>
-                <span class="text-[11px] text-gray-400">Klik salah satu tombol di bawah untuk memunculkan panel HMI &amp; bedah grammar lengkap</span>
-            </div>
-
+            <h2 class="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-2 mb-3">
+                <i class="fa-solid fa-sliders"></i> Machine Fault Scenarios
+            </h2>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                 <button onclick="selectScenario('thermal')" id="btn-thermal" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700/80 transition flex items-center gap-2.5 group">
-                    <div class="w-8 h-8 rounded bg-red-500/15 text-red-400 flex items-center justify-center shrink-0 group-hover:bg-red-500 group-hover:text-white transition">
-                        <i class="fa-solid fa-temperature-high text-sm"></i>
-                    </div>
-                    <div class="overflow-hidden">
-                        <div class="text-xs font-bold text-white truncate">1. Thermal Overload</div>
-                        <div class="text-[10px] text-gray-400 truncate">Panas Berlebih Poros</div>
-                    </div>
+                    <div class="w-8 h-8 rounded bg-red-500/15 text-red-400 flex items-center justify-center shrink-0 group-hover:bg-red-500 group-hover:text-white transition"><i class="fa-solid fa-temperature-high text-sm"></i></div>
+                    <div class="overflow-hidden"><div class="text-xs font-bold text-white truncate">1. Thermal Overload</div><div class="text-[10px] text-gray-400 truncate">Drive Shaft Overheating</div></div>
                 </button>
-
                 <button onclick="selectScenario('lube_oil')" id="btn-lube_oil" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700/80 transition flex items-center gap-2.5 group">
-                    <div class="w-8 h-8 rounded bg-yellow-500/15 text-yellow-400 flex items-center justify-center shrink-0 group-hover:bg-yellow-500 group-hover:text-gray-950 transition">
-                        <i class="fa-solid fa-oil-can text-sm"></i>
-                    </div>
-                    <div class="overflow-hidden">
-                        <div class="text-xs font-bold text-white truncate">2. Low Lube Oil</div>
-                        <div class="text-[10px] text-gray-400 truncate">Oli Gearbox Rendah</div>
-                    </div>
+                    <div class="w-8 h-8 rounded bg-yellow-500/15 text-yellow-400 flex items-center justify-center shrink-0 group-hover:bg-yellow-500 group-hover:text-gray-950 transition"><i class="fa-solid fa-oil-can text-sm"></i></div>
+                    <div class="overflow-hidden"><div class="text-xs font-bold text-white truncate">2. Low Lube Oil</div><div class="text-[10px] text-gray-400 truncate">Gearbox Oil Level</div></div>
                 </button>
-
                 <button onclick="selectScenario('hydraulic')" id="btn-hydraulic" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700/80 transition flex items-center gap-2.5 group">
-                    <div class="w-8 h-8 rounded bg-blue-500/15 text-blue-400 flex items-center justify-center shrink-0 group-hover:bg-blue-500 group-hover:text-white transition">
-                        <i class="fa-solid fa-gauge-high text-sm"></i>
-                    </div>
-                    <div class="overflow-hidden">
-                        <div class="text-xs font-bold text-white truncate">3. Hydraulic Drop</div>
-                        <div class="text-[10px] text-gray-400 truncate">Tekanan Hidrolik Turun</div>
-                    </div>
+                    <div class="w-8 h-8 rounded bg-blue-500/15 text-blue-400 flex items-center justify-center shrink-0 group-hover:bg-blue-500 group-hover:text-white transition"><i class="fa-solid fa-gauge-high text-sm"></i></div>
+                    <div class="overflow-hidden"><div class="text-xs font-bold text-white truncate">3. Hydraulic Drop</div><div class="text-[10px] text-gray-400 truncate">Hydraulic Pressure Loss</div></div>
                 </button>
-
                 <button onclick="selectScenario('pneumatic')" id="btn-pneumatic" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700/80 transition flex items-center gap-2.5 group">
-                    <div class="w-8 h-8 rounded bg-cyan-500/15 text-cyan-400 flex items-center justify-center shrink-0 group-hover:bg-cyan-500 group-hover:text-gray-950 transition">
-                        <i class="fa-solid fa-wind text-sm"></i>
-                    </div>
-                    <div class="overflow-hidden">
-                        <div class="text-xs font-bold text-white truncate">4. Pneumatic Loss</div>
-                        <div class="text-[10px] text-gray-400 truncate">Angin Kompresor Bocor</div>
-                    </div>
+                    <div class="w-8 h-8 rounded bg-cyan-500/15 text-cyan-400 flex items-center justify-center shrink-0 group-hover:bg-cyan-500 group-hover:text-gray-950 transition"><i class="fa-solid fa-wind text-sm"></i></div>
+                    <div class="overflow-hidden"><div class="text-xs font-bold text-white truncate">4. Pneumatic Loss</div><div class="text-[10px] text-gray-400 truncate">Compressed Air Leak</div></div>
                 </button>
-
                 <button onclick="selectScenario('jamming')" id="btn-jamming" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700/80 transition flex items-center gap-2.5 group">
-                    <div class="w-8 h-8 rounded bg-amber-500/15 text-amber-400 flex items-center justify-center shrink-0 group-hover:bg-amber-500 group-hover:text-gray-950 transition">
-                        <i class="fa-solid fa-screwdriver-wrench text-sm"></i>
-                    </div>
-                    <div class="overflow-hidden">
-                        <div class="text-xs font-bold text-white truncate">5. Mech. Jamming</div>
-                        <div class="text-[10px] text-gray-400 truncate">Konveyor Macet</div>
-                    </div>
+                    <div class="w-8 h-8 rounded bg-amber-500/15 text-amber-400 flex items-center justify-center shrink-0 group-hover:bg-amber-500 group-hover:text-gray-950 transition"><i class="fa-solid fa-screwdriver-wrench text-sm"></i></div>
+                    <div class="overflow-hidden"><div class="text-xs font-bold text-white truncate">5. Mech. Jamming</div><div class="text-[10px] text-gray-400 truncate">Conveyor Blockage</div></div>
                 </button>
-
                 <button onclick="selectScenario('vibration')" id="btn-vibration" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700/80 transition flex items-center gap-2.5 group">
-                    <div class="w-8 h-8 rounded bg-purple-500/15 text-purple-400 flex items-center justify-center shrink-0 group-hover:bg-purple-500 group-hover:text-white transition">
-                        <i class="fa-solid fa-wave-square text-sm"></i>
-                    </div>
-                    <div class="overflow-hidden">
-                        <div class="text-xs font-bold text-white truncate">6. Bearing Wear</div>
-                        <div class="text-[10px] text-gray-400 truncate">Laher Spindel Aus</div>
-                    </div>
+                    <div class="w-8 h-8 rounded bg-purple-500/15 text-purple-400 flex items-center justify-center shrink-0 group-hover:bg-purple-500 group-hover:text-white transition"><i class="fa-solid fa-wave-square text-sm"></i></div>
+                    <div class="overflow-hidden"><div class="text-xs font-bold text-white truncate">6. Bearing Wear</div><div class="text-[10px] text-gray-400 truncate">Worn Spindle Bearing</div></div>
                 </button>
-
                 <button onclick="selectScenario('coolant')" id="btn-coolant" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700/80 transition flex items-center gap-2.5 group">
-                    <div class="w-8 h-8 rounded bg-teal-500/15 text-teal-400 flex items-center justify-center shrink-0 group-hover:bg-teal-500 group-hover:text-gray-950 transition">
-                        <i class="fa-solid fa-faucet-drip text-sm"></i>
-                    </div>
-                    <div class="overflow-hidden">
-                        <div class="text-xs font-bold text-white truncate">7. Coolant Blockage</div>
-                        <div class="text-[10px] text-gray-400 truncate">Air Pendingin Mampet</div>
-                    </div>
+                    <div class="w-8 h-8 rounded bg-teal-500/15 text-teal-400 flex items-center justify-center shrink-0 group-hover:bg-teal-500 group-hover:text-gray-950 transition"><i class="fa-solid fa-faucet-drip text-sm"></i></div>
+                    <div class="overflow-hidden"><div class="text-xs font-bold text-white truncate">7. Coolant Blockage</div><div class="text-[10px] text-gray-400 truncate">Clogged Coolant Line</div></div>
                 </button>
-
                 <button onclick="selectScenario('misalignment')" id="btn-misalignment" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700/80 transition flex items-center gap-2.5 group">
-                    <div class="w-8 h-8 rounded bg-pink-500/15 text-pink-400 flex items-center justify-center shrink-0 group-hover:bg-pink-500 group-hover:text-white transition">
-                        <i class="fa-solid fa-arrows-left-right-to-line text-sm"></i>
-                    </div>
-                    <div class="overflow-hidden">
-                        <div class="text-xs font-bold text-white truncate">8. Misalignment</div>
-                        <div class="text-[10px] text-gray-400 truncate">Poros Tidak Senter</div>
-                    </div>
+                    <div class="w-8 h-8 rounded bg-pink-500/15 text-pink-400 flex items-center justify-center shrink-0 group-hover:bg-pink-500 group-hover:text-white transition"><i class="fa-solid fa-arrows-left-right-to-line text-sm"></i></div>
+                    <div class="overflow-hidden"><div class="text-xs font-bold text-white truncate">8. Misalignment</div><div class="text-[10px] text-gray-400 truncate">Shaft Coupling Offset</div></div>
                 </button>
             </div>
         </section>
 
-        <!-- STANDBY PLACEHOLDER -->
-        <section id="standby-screen" class="flex-1 bg-industrial-800/50 border-2 border-dashed border-gray-800 rounded-2xl p-10 flex flex-col items-center justify-center text-center min-h-[380px] fade-in">
-            <div class="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-2xl mb-4 shadow-inner">
-                <i class="fa-solid fa-desktop"></i>
+        <section id="standby-screen" class="flex-1 bg-industrial-800/50 border-2 border-dashed border-gray-800 rounded-2xl p-8 sm:p-10 flex flex-col items-center justify-center text-center min-h-[360px] fade-in">
+            <div class="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center text-2xl mb-4 shadow-inner">
+                <i class="fa-solid fa-laptop-code"></i>
             </div>
-            <h2 class="text-lg font-bold text-white mb-1">Mesin Beroperasi Normal (Standby Mode)</h2>
-            <p class="text-xs text-gray-400 max-w-md leading-relaxed mb-6">
-                Dashboard disembunyikan agar tampilan bersih. Silakan <strong>klik salah satu dari 8 tombol skenario kerusakan di atas</strong> untuk melihat analisis tata bahasa lengkap per kata (Full Sentence Breakdown).
-            </p>
+            <h2 class="text-lg sm:text-xl font-bold text-white mb-2">MechaLingua HMI Simulator</h2>
+            <p class="text-xs sm:text-sm text-gray-400 max-w-lg leading-relaxed">Technical English for Mechanical Engineering: fault alarms, grammar breakdown and sentence building.</p>
         </section>
 
-        <!-- ACTIVE WORKSPACE -->
         <div id="active-workspace" class="hidden flex-col gap-5 fade-in">
 
-            <!-- HMI TERMINAL + VARIATION SWITCHER -->
             <section class="bg-black border-2 border-gray-800 rounded-xl p-5 shadow-2xl">
-                
                 <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-800 pb-3.5 mb-4">
                     <div class="flex items-center space-x-2">
                         <span class="w-3 h-3 rounded-full bg-red-500"></span>
                         <span class="w-3 h-3 rounded-full bg-amber-500"></span>
                         <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
-                        <span class="text-xs font-mono-tech text-gray-400 ml-2">HMI_DIAGNOSTIC_DISPLAY</span>
+                        <span class="text-xs font-mono-tech text-gray-400 ml-2">HMI_DIAGNOSTIC_DISPLAY // PLC_UNIT</span>
                     </div>
-
-                    <!-- Variation Switcher Buttons -->
                     <div class="flex flex-wrap items-center gap-1.5 bg-industrial-900 p-1 rounded-lg border border-gray-800">
-                        <span class="text-[11px] text-gray-400 px-2 font-medium"><i class="fa-solid fa-shuffle text-amber-400 mr-1"></i>Variasi Kalimat:</span>
+                        <span class="text-[11px] text-gray-400 px-2 font-medium"><i class="fa-solid fa-shuffle text-amber-400 mr-1"></i>Sentence Style:</span>
                         <button onclick="switchVariation(0)" id="var-btn-0" class="var-btn text-xs px-2.5 py-1 rounded font-mono-tech font-semibold transition">V1: HMI</button>
                         <button onclick="switchVariation(1)" id="var-btn-1" class="var-btn text-xs px-2.5 py-1 rounded font-mono-tech font-semibold transition">V2: Manual</button>
                         <button onclick="switchVariation(2)" id="var-btn-2" class="var-btn text-xs px-2.5 py-1 rounded font-mono-tech font-semibold transition">V3: SOP</button>
                     </div>
                 </div>
 
-                <!-- Main Fault Code Screen -->
                 <div class="font-mono-tech p-4 rounded-lg bg-red-500/10 border border-red-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div class="space-y-1.5">
                         <div class="flex flex-wrap items-center gap-2 text-xs font-bold text-amber-400">
                             <i class="fa-solid fa-triangle-exclamation blink-warning text-red-400"></i>
                             <span id="fault-code-id">FAULT CODE: ERR-THM-01</span>
-                            <span id="var-style-badge" class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded">Gaya 1</span>
+                            <span id="var-style-badge" class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded"></span>
                         </div>
                         <div id="fault-english-text" class="text-base sm:text-xl font-bold text-white tracking-wide leading-snug"></div>
                     </div>
                     <button onclick="speakCurrentFault()" class="shrink-0 bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold text-xs px-4 py-2.5 rounded-lg flex items-center justify-center gap-2 transition shadow-lg">
-                        <i class="fa-solid fa-volume-high"></i> Suara (TTS)
+                        <i class="fa-solid fa-volume-high"></i> Voice (TTS)
                     </button>
                 </div>
 
-                <!-- STEP 2: MODULE TABS ON DEMAND -->
-                <div class="mt-5 pt-4 border-t border-gray-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <span class="text-xs text-gray-400 font-medium">
-                        <i class="fa-solid fa-hand-pointer text-amber-400 mr-1"></i> <strong>Langkah 2:</strong> Pilih modul analisis:
-                    </span>
-                    <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
-                        <button onclick="openModule('fullBreakdown')" id="tab-fullBreakdown" class="mod-tab text-xs font-semibold px-3.5 py-2 rounded-lg border border-gray-700 bg-industrial-800 hover:bg-gray-700 text-gray-200 transition flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-list-check text-blue-400"></i> 1. Bedah Full per Kata (ESP)
+                <div class="mt-5 pt-4 border-t border-gray-800/80">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:flex lg:flex-wrap gap-2">
+                        <button onclick="openModule('fullBreakdown')" id="tab-fullBreakdown" class="mod-tab text-xs font-semibold px-3 py-2 rounded-lg border border-gray-700 bg-industrial-800 hover:bg-gray-700 text-gray-200 transition flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-list-check text-blue-400"></i> 1. Word-by-Word Breakdown
                         </button>
-                        <button onclick="openModule('translation')" id="tab-translation" class="mod-tab text-xs font-semibold px-3.5 py-2 rounded-lg border border-gray-700 bg-industrial-800 hover:bg-gray-700 text-gray-200 transition flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-language text-emerald-400"></i> 2. Terjemahan &amp; SOP
+                        <button onclick="openModule('translation')" id="tab-translation" class="mod-tab text-xs font-semibold px-3 py-2 rounded-lg border border-gray-700 bg-industrial-800 hover:bg-gray-700 text-gray-200 transition flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-language text-emerald-400"></i> 2. Translation &amp; SOP
                         </button>
-                        <button onclick="openModule('vocab')" id="tab-vocab" class="mod-tab text-xs font-semibold px-3.5 py-2 rounded-lg border border-gray-700 bg-industrial-800 hover:bg-gray-700 text-gray-200 transition flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-spell-check text-amber-400"></i> 3. Sinonim Teknik
+                        <button onclick="openModule('vocab')" id="tab-vocab" class="mod-tab text-xs font-semibold px-3 py-2 rounded-lg border border-gray-700 bg-industrial-800 hover:bg-gray-700 text-gray-200 transition flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-spell-check text-amber-400"></i> 3. Vocabulary
                         </button>
-                        <button onclick="openModule('telemetry')" id="tab-telemetry" class="mod-tab text-xs font-semibold px-3.5 py-2 rounded-lg border border-gray-700 bg-industrial-800 hover:bg-gray-700 text-gray-200 transition flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-chart-line text-red-400"></i> 4. Grafik IoT
+                        <button onclick="openModule('telemetry')" id="tab-telemetry" class="mod-tab text-xs font-semibold px-3 py-2 rounded-lg border border-gray-700 bg-industrial-800 hover:bg-gray-700 text-gray-200 transition flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-chart-line text-red-400"></i> 4. IoT Chart
+                        </button>
+                        <button onclick="openModule('practice')" id="tab-practice" class="mod-tab col-span-2 sm:col-span-1 text-xs font-bold px-3.5 py-2 rounded-lg border border-amber-500/60 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 transition flex items-center justify-center gap-1.5 shadow">
+                            <i class="fa-solid fa-puzzle-piece text-amber-400"></i> 5. Sentence Builder
                         </button>
                     </div>
                 </div>
             </section>
 
-            <!-- PROMPT -->
-            <div id="module-prompt" class="bg-industrial-800/40 border border-gray-800 rounded-xl p-6 text-center text-xs text-gray-400 fade-in">
-                <i class="fa-solid fa-circle-info text-amber-400 mr-1"></i> Silakan klik <strong>"1. Bedah Full per Kata (ESP)"</strong> untuk melihat analisis kelas kata, rumus tenses, dan fungsi mekanis kalimat ini secara mendalam.
-            </div>
-
-            <!-- MODULE 1: FULL SENTENCE WORD-BY-WORD GRAMMAR BREAKDOWN (ESP) -->
+            <!-- MODULE 1 -->
             <section id="panel-fullBreakdown" class="mod-panel hidden bg-industrial-800 border border-gray-700 rounded-xl p-5 shadow-lg fade-in">
                 <div class="flex items-center justify-between border-b border-gray-700 pb-3 mb-4">
                     <div>
-                        <h3 class="text-sm font-bold uppercase tracking-wider text-blue-400 flex items-center gap-2">
-                            <i class="fa-solid fa-list-check"></i> Modul Utama: Bedah Gramatikal Lengkap per Kata (ESP Mechanical English)
-                        </h3>
-                        <p class="text-[11px] text-gray-400 mt-0.5">Setiap kata/frasa pada kalimat aktif di atas dianalisis kelas katanya, rumus bahasa Inggrisnya, serta fungsinya di mesin:</p>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-blue-400 flex items-center gap-2"><i class="fa-solid fa-list-check"></i> Module 1: Full Word-by-Word Grammar Breakdown</h3>
+                        <p class="text-[11px] text-gray-400 mt-0.5">Part of speech, grammar formula and technical function of every word or phrase.</p>
                     </div>
-                    <button onclick="closeModules()" class="text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i> Tutup</button>
+                    <button onclick="closeModules()" class="text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i> Close</button>
+                </div>
+                <div class="bg-black border border-amber-500/40 rounded-lg p-4 mb-5">
+                    <div class="text-xs font-bold uppercase text-amber-400 mb-3 flex items-center gap-1.5"><i class="fa-solid fa-quote-left"></i> Full Sentence with Parts of Speech:</div>
+                    <div id="pos-sentence-view" class="flex flex-wrap items-start gap-x-1 gap-y-4"></div>
                 </div>
 
-                <!-- Sentence Formula Summary Card -->
                 <div class="bg-industrial-900 border border-blue-500/40 rounded-lg p-4 mb-5">
-                    <div class="text-xs font-bold uppercase text-blue-400 mb-1 flex items-center gap-1.5">
-                        <i class="fa-solid fa-square-root-variable"></i> Rumus &amp; Struktur Kalimat Utama (Sentence Pattern):
-                    </div>
+                    <div class="text-xs font-bold uppercase text-blue-400 mb-1 flex items-center gap-1.5"><i class="fa-solid fa-square-root-variable"></i> Sentence Pattern:</div>
                     <p id="sentence-formula-desc" class="text-xs text-gray-200 leading-relaxed font-mono-tech"></p>
                 </div>
-
-                <!-- Word by Word Table -->
                 <div class="overflow-x-auto rounded-lg border border-gray-700">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-industrial-900 text-[11px] uppercase text-gray-400 border-b border-gray-700">
-                                <th class="py-2.5 px-3">Kata / Frasa (Term)</th>
-                                <th class="py-2.5 px-3">Kelas Kata (Part of Speech)</th>
-                                <th class="py-2.5 px-3">Rumus &amp; Analisis Tata Bahasa (Gramm
+                                <th class="py-2.5 px-3">Word / Phrase</th>
+                                <th class="py-2.5 px-3">Part of Speech</th>
+                                <th class="py-2.5 px-3">Grammar Formula</th>
+                                <th class="py-2.5 px-3">Technical Function</th>
+                                <th class="py-2.5 px-3 text-center">Audio</th>
+                            </tr>
+                        </thead>
+                        <tbody id="full-breakdown-tbody" class="divide-y divide-gray-800 text-xs bg-industrial-900/40"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- MODULE 2: Indonesian translation (kept in Indonesian) -->
+            <section id="panel-translation" class="mod-panel hidden bg-industrial-800 border border-gray-700 rounded-xl p-5 shadow-lg fade-in">
+                <div class="flex items-center justify-between border-b border-gray-700 pb-3 mb-4">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-emerald-400">Module 2: Indonesian Translation &amp; Workshop SOP</h3>
+                    <button onclick="closeModules()" class="text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i> Close</button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-emerald-950/30 border border-emerald-600/40 rounded-lg p-4">
+                        <div class="text-xs font-bold uppercase text-emerald-400 mb-1.5">Indonesian Translation</div>
+                        <p id="trans-tech

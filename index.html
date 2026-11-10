@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MechaLingua HMI v5.3 - Technical English CALL & Sentence Builder</title>
-    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <title>MechaLingua HMI v5.4 - Technical English Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         tailwind.config = {
             darkMode: 'class',
-            theme: { extend: { colors: { industrial: { 950: '#070a12', 900: '#0b0f19', 800: '#111827', 700: '#1f2937', accent: '#f59e0b', danger: '#ef4444', normal: '#10b981' } } } }
+            theme: { extend: { colors: { industrial: { 950: '#070a12', 900: '#0b0f19', 800: '#111827', 700: '#1f2937' } } } }
         }
     </script>
     <style>
@@ -19,32 +19,28 @@
         .font-mono-tech { font-family: 'JetBrains Mono', monospace; }
         .blink-warning { animation: blinker 1.2s linear infinite; }
         @keyframes blinker { 50% { opacity: 0.35; } }
-        .fade-in { animation: fadeIn 0.25s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
         .title-glow { text-shadow: 0 0 25px rgba(245, 158, 11, 0.35); }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #111827; }
-        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
     </style>
 </head>
 <body class="bg-industrial-950 text-gray-100 min-h-screen flex flex-col">
 
-    <header class="bg-gradient-to-r from-industrial-900 via-industrial-800 to-industrial-900 border-b-2 border-amber-500/50 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-[0_4px_30px_rgba(245,158,11,0.12)]">
+    <!-- HEADER -->
+    <header class="bg-gradient-to-r from-industrial-900 via-industrial-800 to-industrial-900 border-b-2 border-amber-500/50 px-4 sm:px-6 py-4 sticky top-0 z-30 shadow-lg">
         <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div class="flex items-start sm:items-center space-x-3.5">
-                <div class="bg-gradient-to-br from-amber-400 to-amber-600 text-gray-950 p-3 rounded-xl font-extrabold text-2xl flex items-center justify-center shadow-[0_0_20px_rgba(245,158,11,0.5)] ring-2 ring-amber-300/50 shrink-0">
+                <div class="bg-gradient-to-br from-amber-400 to-amber-600 text-gray-950 p-3 rounded-xl font-extrabold text-2xl flex items-center justify-center shadow ring-2 ring-amber-300/50 shrink-0">
                     <i class="fa-solid fa-gears"></i>
                 </div>
                 <div>
                     <div class="flex flex-wrap items-center gap-2">
-                        <span class="text-[10px] font-mono-tech uppercase tracking-widest bg-amber-500 text-gray-950 font-extrabold px-2 py-0.5 rounded shadow">ESP Mechanical Engineering</span>
+                        <span class="text-[10px] font-mono-tech uppercase tracking-widest bg-amber-500 text-gray-950 font-extrabold px-2 py-0.5 rounded">ESP Mechanical Engineering</span>
                         <span class="text-[10px] font-mono-tech uppercase tracking-wider bg-blue-500/20 text-blue-300 border border-blue-500/40 px-2 py-0.5 rounded">IoT HMI Simulator + CALL</span>
                     </div>
                     <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white mt-1 title-glow">
-                        <span class="bg-gradient-to-r from-white via-amber-200 to-amber-400 bg-clip-text text-transparent">MechaLingua HMI</span>
+                        <span class="bg-gradient-to-r from-white via-amber-200 to-amber-400 bg-clip-text text-transparent">MechaLingua HMI v5.4</span>
                     </h1>
                     <p class="text-xs sm:text-sm text-gray-300 font-medium mt-0.5">
-                        Interactive Web-Based Fault Simulator with <span class="text-amber-400 font-semibold underline decoration-amber-500/60 underline-offset-4">Technical English Breakdown &amp; Sentence Builder</span>
+                        Interactive Fault Simulator with <span class="text-amber-400 font-semibold underline decoration-amber-500/60 underline-offset-4">Technical English Breakdown &amp; Sentence Builder</span>
                     </p>
                 </div>
             </div>
@@ -53,65 +49,70 @@
                     <span id="status-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
                     <span id="status-text">SYSTEM STANDBY // NORMAL</span>
                 </div>
-                <button onclick="resetToStandby()" class="bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs px-3.5 py-2 rounded-lg font-semibold transition flex items-center gap-1.5 border border-gray-700 shadow">
+                <button type="button" onclick="resetToStandby()" class="bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs px-3.5 py-2 rounded-lg font-semibold transition flex items-center gap-1.5 border border-gray-700">
                     <i class="fa-solid fa-power-off text-emerald-400"></i> Standby / Reset
                 </button>
             </div>
         </div>
     </header>
 
+    <!-- MAIN -->
     <main class="flex-1 p-4 sm:p-6 max-w-6xl w-full mx-auto flex flex-col gap-5">
 
+        <!-- SCENARIO BUTTONS -->
         <section class="bg-industrial-800 border border-gray-800 rounded-xl p-4 shadow-lg">
             <h2 class="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-2 mb-3">
-                <i class="fa-solid fa-sliders"></i> Machine Fault Scenarios
+                <i class="fa-solid fa-sliders"></i> Step 1: Select Machine Fault Scenario
             </h2>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                <button onclick="selectScenario('thermal')" id="btn-thermal" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700/80 transition flex items-center gap-2.5 group">
-                    <div class="w-8 h-8 rounded bg-red-500/15 text-red-400 flex items-center justify-center shrink-0 group-hover:bg-red-500 group-hover:text-white transition"><i class="fa-solid fa-temperature-high text-sm"></i></div>
+                <button type="button" onclick="selectScenario('thermal')" id="btn-thermal" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700 transition flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded bg-red-500/15 text-red-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-temperature-high text-sm"></i></div>
                     <div class="overflow-hidden"><div class="text-xs font-bold text-white truncate">1. Thermal Overload</div><div class="text-[10px] text-gray-400 truncate">Drive Shaft Overheating</div></div>
                 </button>
-                <button onclick="selectScenario('lube_oil')" id="btn-lube_oil" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700/80 transition flex items-center gap-2.5 group">
-                    <div class="w-8 h-8 rounded bg-yellow-500/15 text-yellow-400 flex items-center justify-center shrink-0 group-hover:bg-yellow-500 group-hover:text-gray-950 transition"><i class="fa-solid fa-oil-can text-sm"></i></div>
+                <button type="button" onclick="selectScenario('lube_oil')" id="btn-lube_oil" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700 transition flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded bg-yellow-500/15 text-yellow-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-oil-can text-sm"></i></div>
                     <div class="overflow-hidden"><div class="text-xs font-bold text-white truncate">2. Low Lube Oil</div><div class="text-[10px] text-gray-400 truncate">Gearbox Oil Level</div></div>
                 </button>
-                <button onclick="selectScenario('hydraulic')" id="btn-hydraulic" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700/80 transition flex items-center gap-2.5 group">
-                    <div class="w-8 h-8 rounded bg-blue-500/15 text-blue-400 flex items-center justify-center shrink-0 group-hover:bg-blue-500 group-hover:text-white transition"><i class="fa-solid fa-gauge-high text-sm"></i></div>
+                <button type="button" onclick="selectScenario('hydraulic')" id="btn-hydraulic" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700 transition flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded bg-blue-500/15 text-blue-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-gauge-high text-sm"></i></div>
                     <div class="overflow-hidden"><div class="text-xs font-bold text-white truncate">3. Hydraulic Drop</div><div class="text-[10px] text-gray-400 truncate">Hydraulic Pressure Loss</div></div>
                 </button>
-                <button onclick="selectScenario('pneumatic')" id="btn-pneumatic" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700/80 transition flex items-center gap-2.5 group">
-                    <div class="w-8 h-8 rounded bg-cyan-500/15 text-cyan-400 flex items-center justify-center shrink-0 group-hover:bg-cyan-500 group-hover:text-gray-950 transition"><i class="fa-solid fa-wind text-sm"></i></div>
+                <button type="button" onclick="selectScenario('pneumatic')" id="btn-pneumatic" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700 transition flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded bg-cyan-500/15 text-cyan-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-wind text-sm"></i></div>
                     <div class="overflow-hidden"><div class="text-xs font-bold text-white truncate">4. Pneumatic Loss</div><div class="text-[10px] text-gray-400 truncate">Compressed Air Leak</div></div>
                 </button>
-                <button onclick="selectScenario('jamming')" id="btn-jamming" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700/80 transition flex items-center gap-2.5 group">
-                    <div class="w-8 h-8 rounded bg-amber-500/15 text-amber-400 flex items-center justify-center shrink-0 group-hover:bg-amber-500 group-hover:text-gray-950 transition"><i class="fa-solid fa-screwdriver-wrench text-sm"></i></div>
+                <button type="button" onclick="selectScenario('jamming')" id="btn-jamming" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700 transition flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded bg-amber-500/15 text-amber-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-screwdriver-wrench text-sm"></i></div>
                     <div class="overflow-hidden"><div class="text-xs font-bold text-white truncate">5. Mech. Jamming</div><div class="text-[10px] text-gray-400 truncate">Conveyor Blockage</div></div>
                 </button>
-                <button onclick="selectScenario('vibration')" id="btn-vibration" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700/80 transition flex items-center gap-2.5 group">
-                    <div class="w-8 h-8 rounded bg-purple-500/15 text-purple-400 flex items-center justify-center shrink-0 group-hover:bg-purple-500 group-hover:text-white transition"><i class="fa-solid fa-wave-square text-sm"></i></div>
+                <button type="button" onclick="selectScenario('vibration')" id="btn-vibration" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700 transition flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded bg-purple-500/15 text-purple-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-wave-square text-sm"></i></div>
                     <div class="overflow-hidden"><div class="text-xs font-bold text-white truncate">6. Bearing Wear</div><div class="text-[10px] text-gray-400 truncate">Worn Spindle Bearing</div></div>
                 </button>
-                <button onclick="selectScenario('coolant')" id="btn-coolant" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700/80 transition flex items-center gap-2.5 group">
-                    <div class="w-8 h-8 rounded bg-teal-500/15 text-teal-400 flex items-center justify-center shrink-0 group-hover:bg-teal-500 group-hover:text-gray-950 transition"><i class="fa-solid fa-faucet-drip text-sm"></i></div>
+                <button type="button" onclick="selectScenario('coolant')" id="btn-coolant" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700 transition flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded bg-teal-500/15 text-teal-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-faucet-drip text-sm"></i></div>
                     <div class="overflow-hidden"><div class="text-xs font-bold text-white truncate">7. Coolant Blockage</div><div class="text-[10px] text-gray-400 truncate">Clogged Coolant Line</div></div>
                 </button>
-                <button onclick="selectScenario('misalignment')" id="btn-misalignment" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700/80 transition flex items-center gap-2.5 group">
-                    <div class="w-8 h-8 rounded bg-pink-500/15 text-pink-400 flex items-center justify-center shrink-0 group-hover:bg-pink-500 group-hover:text-white transition"><i class="fa-solid fa-arrows-left-right-to-line text-sm"></i></div>
+                <button type="button" onclick="selectScenario('misalignment')" id="btn-misalignment" class="fault-btn text-left p-2.5 rounded-lg bg-industrial-900 hover:bg-gray-800 border border-gray-700 transition flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded bg-pink-500/15 text-pink-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-arrows-left-right-to-line text-sm"></i></div>
                     <div class="overflow-hidden"><div class="text-xs font-bold text-white truncate">8. Misalignment</div><div class="text-[10px] text-gray-400 truncate">Shaft Coupling Offset</div></div>
                 </button>
             </div>
         </section>
 
-        <section id="standby-screen" class="flex-1 bg-industrial-800/50 border-2 border-dashed border-gray-800 rounded-2xl p-8 sm:p-10 flex flex-col items-center justify-center text-center min-h-[360px] fade-in">
-            <div class="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center text-2xl mb-4 shadow-inner">
+        <!-- STANDBY SCREEN -->
+        <section id="standby-screen" class="flex-1 bg-industrial-800/50 border-2 border-dashed border-gray-800 rounded-2xl p-8 flex flex-col items-center justify-center text-center min-h-[300px]">
+            <div class="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center text-2xl mb-4">
                 <i class="fa-solid fa-laptop-code"></i>
             </div>
-            <h2 class="text-lg sm:text-xl font-bold text-white mb-2">MechaLingua HMI Simulator</h2>
-            <p class="text-xs sm:text-sm text-gray-400 max-w-lg leading-relaxed">Technical English for Mechanical Engineering: fault alarms, grammar breakdown and sentence building.</p>
+            <h2 class="text-lg sm:text-xl font-bold text-white mb-2">System Ready (Standby Mode)</h2>
+            <p class="text-xs sm:text-sm text-gray-400 max-w-lg">Click any of the <strong>8 Machine Fault Scenario buttons above</strong> to launch the HMI Console, Grammar Breakdown, IoT Sensor Chart, and Sentence Builder.</p>
         </section>
 
-        <div id="active-workspace" class="hidden flex-col gap-5 fade-in">
+        <!-- ACTIVE WORKSPACE -->
+        <div id="active-workspace" class="hidden flex-col gap-5">
 
+            <!-- HMI DISPLAY -->
             <section class="bg-black border-2 border-gray-800 rounded-xl p-5 shadow-2xl">
                 <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-800 pb-3.5 mb-4">
                     <div class="flex items-center space-x-2">
@@ -121,10 +122,10 @@
                         <span class="text-xs font-mono-tech text-gray-400 ml-2">HMI_DIAGNOSTIC_DISPLAY // PLC_UNIT</span>
                     </div>
                     <div class="flex flex-wrap items-center gap-1.5 bg-industrial-900 p-1 rounded-lg border border-gray-800">
-                        <span class="text-[11px] text-gray-400 px-2 font-medium"><i class="fa-solid fa-shuffle text-amber-400 mr-1"></i>Sentence Style:</span>
-                        <button onclick="switchVariation(0)" id="var-btn-0" class="var-btn text-xs px-2.5 py-1 rounded font-mono-tech font-semibold transition">V1: HMI</button>
-                        <button onclick="switchVariation(1)" id="var-btn-1" class="var-btn text-xs px-2.5 py-1 rounded font-mono-tech font-semibold transition">V2: Manual</button>
-                        <button onclick="switchVariation(2)" id="var-btn-2" class="var-btn text-xs px-2.5 py-1 rounded font-mono-tech font-semibold transition">V3: SOP</button>
+                        <span class="text-[11px] text-gray-400 px-2 font-medium">Sentence Style:</span>
+                        <button type="button" onclick="switchVariation(0)" id="var-btn-0" class="var-btn text-xs px-2.5 py-1 rounded font-mono-tech font-semibold">V1: HMI</button>
+                        <button type="button" onclick="switchVariation(1)" id="var-btn-1" class="var-btn text-xs px-2.5 py-1 rounded font-mono-tech font-semibold">V2: Manual</button>
+                        <button type="button" onclick="switchVariation(2)" id="var-btn-2" class="var-btn text-xs px-2.5 py-1 rounded font-mono-tech font-semibold">V3: SOP</button>
                     </div>
                 </div>
 
@@ -132,53 +133,51 @@
                     <div class="space-y-1.5">
                         <div class="flex flex-wrap items-center gap-2 text-xs font-bold text-amber-400">
                             <i class="fa-solid fa-triangle-exclamation blink-warning text-red-400"></i>
-                            <span id="fault-code-id">FAULT CODE: ERR-THM-01</span>
+                            <span id="fault-code-id">FAULT CODE</span>
                             <span id="var-style-badge" class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded"></span>
                         </div>
-                        <div id="fault-english-text" class="text-base sm:text-xl font-bold text-white tracking-wide leading-snug"></div>
+                        <div id="fault-english-text" class="text-base sm:text-xl font-bold text-white tracking-wide"></div>
                     </div>
-                    <button onclick="speakCurrentFault()" class="shrink-0 bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold text-xs px-4 py-2.5 rounded-lg flex items-center justify-center gap-2 transition shadow-lg">
+                    <button type="button" onclick="speakCurrentFault()" class="shrink-0 bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold text-xs px-4 py-2.5 rounded-lg flex items-center justify-center gap-2">
                         <i class="fa-solid fa-volume-high"></i> Voice (TTS)
                     </button>
                 </div>
 
-                <div class="mt-5 pt-4 border-t border-gray-800/80">
+                <!-- MODULE TABS -->
+                <div class="mt-5 pt-4 border-t border-gray-800">
                     <div class="grid grid-cols-2 sm:grid-cols-3 lg:flex lg:flex-wrap gap-2">
-                        <button onclick="openModule('fullBreakdown')" id="tab-fullBreakdown" class="mod-tab text-xs font-semibold px-3 py-2 rounded-lg border border-gray-700 bg-industrial-800 hover:bg-gray-700 text-gray-200 transition flex items-center justify-center gap-1.5">
-                            <i class="fa-solid fa-list-check text-blue-400"></i> 1. Word-by-Word Breakdown
+                        <button type="button" onclick="openModule('fullBreakdown')" id="tab-fullBreakdown" class="mod-tab text-xs font-semibold px-3 py-2 rounded-lg border border-gray-700 bg-industrial-800 hover:bg-gray-700 text-gray-200 flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-list-check text-blue-400"></i> 1. Word Breakdown
                         </button>
-                        <button onclick="openModule('translation')" id="tab-translation" class="mod-tab text-xs font-semibold px-3 py-2 rounded-lg border border-gray-700 bg-industrial-800 hover:bg-gray-700 text-gray-200 transition flex items-center justify-center gap-1.5">
+                        <button type="button" onclick="openModule('translation')" id="tab-translation" class="mod-tab text-xs font-semibold px-3 py-2 rounded-lg border border-gray-700 bg-industrial-800 hover:bg-gray-700 text-gray-200 flex items-center justify-center gap-1.5">
                             <i class="fa-solid fa-language text-emerald-400"></i> 2. Translation &amp; SOP
                         </button>
-                        <button onclick="openModule('vocab')" id="tab-vocab" class="mod-tab text-xs font-semibold px-3 py-2 rounded-lg border border-gray-700 bg-industrial-800 hover:bg-gray-700 text-gray-200 transition flex items-center justify-center gap-1.5">
+                        <button type="button" onclick="openModule('vocab')" id="tab-vocab" class="mod-tab text-xs font-semibold px-3 py-2 rounded-lg border border-gray-700 bg-industrial-800 hover:bg-gray-700 text-gray-200 flex items-center justify-center gap-1.5">
                             <i class="fa-solid fa-spell-check text-amber-400"></i> 3. Vocabulary
                         </button>
-                        <button onclick="openModule('telemetry')" id="tab-telemetry" class="mod-tab text-xs font-semibold px-3 py-2 rounded-lg border border-gray-700 bg-industrial-800 hover:bg-gray-700 text-gray-200 transition flex items-center justify-center gap-1.5">
+                        <button type="button" onclick="openModule('telemetry')" id="tab-telemetry" class="mod-tab text-xs font-semibold px-3 py-2 rounded-lg border border-gray-700 bg-industrial-800 hover:bg-gray-700 text-gray-200 flex items-center justify-center gap-1.5">
                             <i class="fa-solid fa-chart-line text-red-400"></i> 4. IoT Chart
                         </button>
-                        <button onclick="openModule('practice')" id="tab-practice" class="mod-tab col-span-2 sm:col-span-1 text-xs font-bold px-3.5 py-2 rounded-lg border border-amber-500/60 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 transition flex items-center justify-center gap-1.5 shadow">
+                        <button type="button" onclick="openModule('practice')" id="tab-practice" class="mod-tab col-span-2 sm:col-span-1 text-xs font-bold px-3.5 py-2 rounded-lg border border-amber-500/60 bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 flex items-center justify-center gap-1.5">
                             <i class="fa-solid fa-puzzle-piece text-amber-400"></i> 5. Sentence Builder
                         </button>
                     </div>
                 </div>
             </section>
 
-            <!-- MODULE 1 -->
-            <section id="panel-fullBreakdown" class="mod-panel hidden bg-industrial-800 border border-gray-700 rounded-xl p-5 shadow-lg fade-in">
+            <!-- MODULE 1: FULL BREAKDOWN -->
+            <section id="panel-fullBreakdown" class="mod-panel hidden bg-industrial-800 border border-gray-700 rounded-xl p-5 shadow-lg">
                 <div class="flex items-center justify-between border-b border-gray-700 pb-3 mb-4">
-                    <div>
-                        <h3 class="text-sm font-bold uppercase tracking-wider text-blue-400 flex items-center gap-2"><i class="fa-solid fa-list-check"></i> Module 1: Full Word-by-Word Grammar Breakdown</h3>
-                        <p class="text-[11px] text-gray-400 mt-0.5">Part of speech, grammar formula and technical function of every word or phrase.</p>
-                    </div>
-                    <button onclick="closeModules()" class="text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i> Close</button>
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-blue-400">Module 1: Full Word-by-Word Grammar Breakdown</h3>
+                    <button type="button" onclick="closeModules()" class="text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i> Close</button>
                 </div>
-                <div class="bg-black border border-amber-500/40 rounded-lg p-4 mb-5">
-                    <div class="text-xs font-bold uppercase text-amber-400 mb-3 flex items-center gap-1.5"><i class="fa-solid fa-quote-left"></i> Full Sentence with Parts of Speech:</div>
-                    <div id="pos-sentence-view" class="flex flex-wrap items-start gap-x-1 gap-y-4"></div>
+                <div class="bg-black border border-amber-500/40 rounded-lg p-4 mb-4">
+                    <div class="text-xs font-bold uppercase text-amber-400 mb-2">Parts of Speech Structure:</div>
+                    <div id="pos-sentence-view" class="flex flex-wrap items-start gap-2"></div>
                 </div>
-                <div class="bg-industrial-900 border border-blue-500/40 rounded-lg p-4 mb-5">
-                    <div class="text-xs font-bold uppercase text-blue-400 mb-1 flex items-center gap-1.5"><i class="fa-solid fa-square-root-variable"></i> Sentence Pattern:</div>
-                    <p id="sentence-formula-desc" class="text-xs text-gray-200 leading-relaxed font-mono-tech"></p>
+                <div class="bg-industrial-900 border border-blue-500/40 rounded-lg p-3.5 mb-4">
+                    <div class="text-xs font-bold uppercase text-blue-400 mb-1">Sentence Pattern Formula:</div>
+                    <p id="sentence-formula-desc" class="text-xs text-gray-200 font-mono-tech"></p>
                 </div>
                 <div class="overflow-x-auto rounded-lg border border-gray-700">
                     <table class="w-full text-left border-collapse">
@@ -196,13 +195,658 @@
                 </div>
             </section>
 
-            <!-- MODULE 2 -->
-            <section id="panel-translation" class="mod-panel hidden bg-industrial-800 border border-gray-700 rounded-xl p-5 shadow-lg fade-in">
+            <!-- MODULE 2: TRANSLATION (INDONESIAN) -->
+            <section id="panel-translation" class="mod-panel hidden bg-industrial-800 border border-gray-700 rounded-xl p-5 shadow-lg">
                 <div class="flex items-center justify-between border-b border-gray-700 pb-3 mb-4">
                     <h3 class="text-sm font-bold uppercase tracking-wider text-emerald-400">Module 2: Technical Translation &amp; Workshop SOP</h3>
-                    <button onclick="closeModules()" class="text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i> Close</button>
+                    <button type="button" onclick="closeModules()" class="text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i> Close</button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="bg-emerald-950/30 border border-emerald-600/40 rounded-lg p-4">
-                        <div class="text-xs font-bold uppercase text-emerald-400 mb-1.5"><i class="fa-solid fa-circle-check"></i> Indonesian Translation (Terjemahan Baku)</div>
-        
+                        <div class="text-xs font-bold uppercase text-emerald-400 mb-1.5">Indonesian Translation (Terjemahan Baku)</div>
+                        <p id="trans-technical" class="text-sm font-semibold text-white leading-relaxed"></p>
+                    </div>
+                    <div class="bg-industrial-900 border border-gray-700 rounded-lg p-4">
+                        <div class="text-xs font-bold uppercase text-amber-400 mb-1.5">Workshop Slang &amp; Repair SOP</div>
+                        <p id="trans-local-sop" class="text-xs text-gray-300 leading-relaxed"></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MODULE 3: VOCABULARY -->
+            <section id="panel-vocab" class="mod-panel hidden bg-industrial-800 border border-gray-700 rounded-xl p-5 shadow-lg">
+                <div class="flex items-center justify-between border-b border-gray-700 pb-3 mb-4">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-amber-400">Module 3: Vocabulary &amp; Technical Synonyms</h3>
+                    <button type="button" onclick="closeModules()" class="text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i> Close</button>
+                </div>
+                <div class="overflow-x-auto rounded-lg border border-gray-700 mb-4">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-industrial-900 text-[11px] uppercase text-gray-400 border-b border-gray-700">
+                                <th class="py-2.5 px-3">Term</th>
+                                <th class="py-2.5 px-3">Part of Speech</th>
+                                <th class="py-2.5 px-3">Technical Meaning</th>
+                                <th class="py-2.5 px-3">Alternative Synonyms</th>
+                                <th class="py-2.5 px-3 text-center">Audio</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vocab-table-body" class="divide-y divide-gray-800 text-xs bg-industrial-900/40"></tbody>
+                    </table>
+                </div>
+                <div class="bg-industrial-900 border border-gray-700 rounded-lg p-4">
+                    <div class="text-xs font-bold uppercase text-amber-400 mb-2">Comparison of 3 Sentence Variations:</div>
+                    <div id="all-variations-list" class="space-y-2 text-xs"></div>
+                </div>
+            </section>
+
+            <!-- MODULE 4: IOT TELEMETRY CHART -->
+            <section id="panel-telemetry" class="mod-panel hidden bg-industrial-800 border border-gray-700 rounded-xl p-5 shadow-lg">
+                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-700 pb-3 mb-4">
+                    <div>
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-red-400">Module 4: Real-Time IoT Telemetry Sensor Chart</h3>
+                        <p id="chart-subtitle" class="text-xs text-gray-400 mt-0.5">Sensor Telemetry</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span id="telemetry-live-val" class="text-xs font-mono-tech font-bold px-2.5 py-1 rounded bg-industrial-900 text-emerald-400 border border-gray-700">NORMAL</span>
+                        <button type="button" onclick="closeModules()" class="text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i> Close</button>
+                    </div>
+                </div>
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-4 bg-industrial-900 p-3 rounded-lg border border-gray-800">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-300 font-medium">Simulation Control:</span>
+                        <button type="button" onclick="startFailureSimulation()" class="bg-red-600 hover:bg-red-500 text-white font-bold text-xs px-3.5 py-1.5 rounded shadow flex items-center gap-1.5">
+                            <i class="fa-solid fa-play"></i> Start Failure Simulation
+                        </button>
+                        <button type="button" onclick="resetFailureSimulation()" class="bg-gray-700 hover:bg-gray-600 text-gray-200 font-bold text-xs px-3.5 py-1.5 rounded shadow flex items-center gap-1.5">
+                            <i class="fa-solid fa-rotate-right"></i> Reset Normal
+                        </button>
+                    </div>
+                    <div id="sim-status-indicator" class="text-xs font-mono-tech font-bold text-emerald-400">
+                        STATUS: NORMAL RUNNING (Click 'Start Failure' to project fault)
+                    </div>
+                </div>
+                <div class="relative w-full h-56 bg-industrial-900/60 p-3 rounded-lg border border-gray-800">
+                    <canvas id="telemetryChart"></canvas>
+                </div>
+            </section>
+
+            <!-- MODULE 5: SENTENCE BUILDER -->
+            <section id="panel-practice" class="mod-panel hidden bg-industrial-800 border border-gray-700 rounded-xl p-5 shadow-lg">
+                <div class="flex items-center justify-between border-b border-gray-700 pb-3 mb-4">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-amber-400">Module 5: Technical English Sentence Builder</h3>
+                    <button type="button" onclick="closeModules()" class="text-xs text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i> Close</button>
+                </div>
+                <div class="bg-industrial-900 border border-gray-700 rounded-lg p-4 mb-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-[10px] bg-blue-500/20 text-blue-300 border border-blue-500/40 px-2 py-0.5 rounded font-mono-tech">ESP Exercise</span>
+                        <span id="quiz-score-display" class="text-xs font-mono-tech font-bold text-emerald-400">Score: 0</span>
+                    </div>
+                    <div id="quiz-target-meaning" class="text-sm font-bold text-amber-300 bg-industrial-950 p-3 rounded border border-amber-500/30 mb-2"></div>
+                    <div id="quiz-grammar-hint" class="text-[11px] text-gray-400 font-mono-tech"></div>
+                </div>
+                <div id="quiz-answer-dropzone" class="bg-black border border-gray-700 rounded-lg p-4 mb-4 min-h-[64px] flex flex-wrap items-center gap-2"></div>
+                <div id="quiz-word-bank" class="flex flex-wrap items-center gap-1.5 mb-4"></div>
+                <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-gray-700">
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="checkQuizAnswer()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2 rounded">
+                            <i class="fa-solid fa-check"></i> Check Answer
+                        </button>
+                        <button type="button" onclick="clearQuizSelection()" class="bg-gray-700 hover:bg-gray-600 text-gray-200 text-xs px-3 py-2 rounded font-semibold">
+                            Clear
+                        </button>
+                    </div>
+                    <div id="quiz-feedback-msg" class="text-xs font-bold"></div>
+                    <button type="button" onclick="nextQuizQuestion()" class="bg-amber-500 hover:bg-amber-400 text-gray-950 font-bold text-xs px-4 py-2 rounded">
+                        Next Scenario <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        const faultDatabase = {
+            thermal: {
+                code: "ERR-THM-01", sensorName: "Primary Drive Shaft Temperature (°C)", shortMetric: "Shaft Temp", unit: "°C", normalBase: 55, faultSpike: 118,
+                localSop: "<strong>Bahasa Bengkel:</strong> As utama <em>overheat</em>.<br><strong>SOP:</strong> Kurangi beban putaran, cek <em>cooling fan</em>.",
+                variations: [
+                    {
+                        label: "V1: HMI", englishText: "WARNING: Critical Thermal Overload Detected on Primary Drive Shaft.",
+                        translation: "Peringatan: Beban Panas Berlebih Kritis Terdeteksi pada Poros Penggerak Utama.",
+                        formulaDesc: "[Noun] + [Adjective] + [Compound Noun] + [Past Participle (Reduced Passive)] + [Preposition] + [Compound Noun]",
+                        fullBreakdown: [
+                            { word: "WARNING", pos: "Noun", formula: "Alert Signal Noun", func: "Initial HMI warning status." },
+                            { word: "Critical", pos: "Adjective", formula: "Modifier", func: "Indicates dangerous severity." },
+                            { word: "Thermal Overload", pos: "Compound Noun", formula: "Adj + Noun", func: "Excessive heat load." },
+                            { word: "Detected", pos: "Past Participle (V3)", formula: "Reduced Passive: [is] Detected", func: "Short passive form for HMI screen." },
+                            { word: "on", pos: "Preposition", formula: "Location Preposition", func: "Indicates component position." },
+                            { word: "Primary Drive Shaft", pos: "Compound Noun", formula: "Adj + Noun + Head Noun", func: "Main rotating drive shaft." }
+                        ]
+                    },
+                    {
+                        label: "V2: Manual", englishText: "ALARM: Excessive Heat Has Been Generated in the Main Motor Spindle.",
+                        translation: "Alarm: Panas Berlebih Telah Dihasilkan di Spindel Motor Utama.",
+                        formulaDesc: "[Noun] + [Adj + Noun] + [Present Perfect Passive: Has + Been + V3] + [Prep Phrase]",
+                        fullBreakdown: [
+                            { word: "ALARM", pos: "Noun", formula: "Base Noun", func: "Service manual alert." },
+                            { word: "Excessive Heat", pos: "Adjective + Noun", formula: "Noun Phrase", func: "Heat above safe limit." },
+                            { word: "Has Been Generated", pos: "Verb Phrase", formula: "Has + been + Generated (V3)", func: "Present Perfect Passive action." },
+                            { word: "in the Main Motor Spindle", pos: "Prep Phrase", formula: "Prep + Compound Noun", func: "Location of heat generation." }
+                        ]
+                    },
+                    {
+                        label: "V3: SOP", englishText: "DANGER: Overheating is Observed on Rotor Axle. Machine Must Be Cooled Down.",
+                        translation: "Bahaya: Pemanasan Berlebih Teramati pada Poros Rotor. Mesin Harus Didinginkan.",
+                        formulaDesc: "[Noun] + [Gerund + Present Passive] + [Noun + Modal Passive: Must + Be + V3]",
+                        fullBreakdown: [
+                            { word: "Overheating", pos: "Gerund (Noun)", formula: "Verb + -ing", func: "Subject noun." },
+                            { word: "is Observed", pos: "Present Passive", formula: "Is + Observed (V3)", func: "Monitored by thermal sensor." },
+                            { word: "Machine Must Be Cooled Down", pos: "Modal Passive", formula: "Subject + Must + be + V3", func: "Mandatory SOP action." }
+                        ]
+                    }
+                ],
+                vocabList: [{ word: "Thermal Overload", pos: "Compound Noun", meaning: "Excessive heat load", synonyms: "Excessive Heat, Overheating" }]
+            },
+            lube_oil: {
+                code: "ERR-LUB-02", sensorName: "Gearbox Oil Sump Level (%)", shortMetric: "Oil Level", unit: "%", normalBase: 82, faultSpike: 12,
+                localSop: "<strong>Bahasa Bengkel:</strong> Oli gearbox tekor.<br><strong>SOP:</strong> Cek <em>sight glass</em>, tambah oli SAE standar.",
+                variations: [
+                    {
+                        label: "V1: HMI", englishText: "WARNING: Critically Low Lubrication Oil Level is Detected in Gearbox Sump.",
+                        translation: "Peringatan: Level Oli Pelumas Sangat Rendah Terdeteksi di Bak Gearbox.",
+                        formulaDesc: "[Noun] + [Adverb + Adj + Compound Noun] + [Present Passive: Is + V3] + [Prep Phrase]",
+                        fullBreakdown: [
+                            { word: "Critically Low", pos: "Adverb + Adj", formula: "Modifier", func: "Dangerously low level." },
+                            { word: "Lubrication Oil Level", pos: "Compound Noun", formula: "Noun Phrase", func: "Oil volume height." },
+                            { word: "is Detected", pos: "Present Passive", formula: "Is + Detected (V3)", func: "Sensed by float switch." },
+                            { word: "in Gearbox Sump", pos: "Prep Phrase", formula: "Prep + Compound Noun", func: "Lower gearbox oil pan." }
+                        ]
+                    },
+                    {
+                        label: "V2: Manual", englishText: "FAULT: Gearbox Lubricant Has Been Depleted Below Minimum Threshold.",
+                        translation: "Kesalahan: Pelumas Gearbox Telah Terkuras di Bawah Ambang Batas Minimum.",
+                        formulaDesc: "[Noun] + [Compound Noun] + [Present Perfect Passive] + [Prep Phrase]",
+                        fullBreakdown: [
+                            { word: "Gearbox Lubricant", pos: "Compound Noun", formula: "Noun + Noun", func: "Transmission oil." },
+                            { word: "Has Been Depleted", pos: "Present Perfect Passive", formula: "Has + been + Depleted (V3)", func: "Drained or exhausted." },
+                            { word: "Below Minimum Threshold", pos: "Prep Phrase", formula: "Prep + Noun Phrase", func: "Under safe limit." }
+                        ]
+                    },
+                    {
+                        label: "V3: SOP", englishText: "ALARM: Insufficient Oil Volume is Sensed. Lubricant Must Be Refilled.",
+                        translation: "Alarm: Volume Oli Tidak Mencukupi Terbaca. Pelumas Harus Diisi Ulang.",
+                        formulaDesc: "[Adj + Noun + Present Passive] + [Modal Passive: Must + Be + V3]",
+                        fullBreakdown: [
+                            { word: "Insufficient Oil Volume", pos: "Compound Noun", formula: "Prefix In- + Adj + Noun", func: "Not enough oil." },
+                            { word: "is Sensed", pos: "Present Passive", formula: "Is + Sensed (V3)", func: "Detected by sensor." },
+                            { word: "Lubricant Must Be Refilled", pos: "Modal Passive", formula: "Must + be + Refilled (V3)", func: "Mandatory refill SOP." }
+                        ]
+                    }
+                ],
+                vocabList: [{ word: "Lubrication Oil", pos: "Compound Noun", meaning: "Machine lube oil", synonyms: "Lubricant, Gear Oil" }]
+            },
+            hydraulic: {
+                code: "ERR-HYD-03", sensorName: "Hydraulic Line Pressure (Bar)", shortMetric: "Hyd. Pressure", unit: "Bar", normalBase: 145, faultSpike: 32,
+                localSop: "<strong>Bahasa Bengkel:</strong> Tekanan oli hidrolik ngedrop.<br><strong>SOP:</strong> Cek kebocoran selang hidrolik.",
+                variations: [
+                    {
+                        label: "V1: HMI", englishText: "FAULT: Insufficient Hydraulic Pressure is Detected in Main Actuator Valve.",
+                        translation: "Kesalahan: Tekanan Hidrolik Kurang Terdeteksi pada Katup Aktuator Utama.",
+                        formulaDesc: "[Noun] + [Adj + Compound Noun] + [Present Passive: Is + V3] + [Prep Phrase]",
+                        fullBreakdown: [
+                            { word: "Insufficient Hydraulic Pressure", pos: "Compound Noun", formula: "Adj + Adj + Noun", func: "Low fluid pressure." },
+                            { word: "is Detected", pos: "Present Passive", formula: "Is + Detected (V3)", func: "Read by pressure transmitter." },
+                            { word: "in Main Actuator Valve", pos: "Prep Phrase", formula: "Prep + Compound Noun", func: "Primary control valve." }
+                        ]
+                    },
+                    {
+                        label: "V2: Manual", englishText: "WARNING: Sudden Pressure Drop Was Recorded in Hydraulic Manifold.",
+                        translation: "Peringatan: Penurunan Tekanan Mendadak Tercatat di Manifold Hidrolik.",
+                        formulaDesc: "[Noun] + [Compound Noun] + [Past Passive: Was + V3] + [Prep Phrase]",
+                        fullBreakdown: [
+                            { word: "Sudden Pressure Drop", pos: "Compound Noun", formula: "Adj + Noun + Noun", func: "Abrupt pressure loss." },
+                            { word: "Was Recorded", pos: "Past Passive", formula: "Was + Recorded (V3)", func: "Logged by PLC." },
+                            { word: "in Hydraulic Manifold", pos: "Prep Phrase", formula: "Prep + Compound Noun", func: "Fluid distribution block." }
+                        ]
+                    },
+                    {
+                        label: "V3: SOP", englishText: "ALARM: Substandard Fluid Pressure is Identified. Pump Must Be Inspected.",
+                        translation: "Alarm: Tekanan Fluida di Bawah Standar Teridentifikasi. Pompa Harus Diperiksa.",
+                        formulaDesc: "[Compound Noun + Present Passive] + [Modal Passive: Must + Be + V3]",
+                        fullBreakdown: [
+                            { word: "Substandard Fluid Pressure", pos: "Compound Noun", formula: "Prefix Sub- + Noun", func: "Below normal bar rating." },
+                            { word: "is Identified", pos: "Present Passive", formula: "Is + Identified (V3)", func: "Recognized by system." },
+                            { word: "Pump Must Be Inspected", pos: "Modal Passive", formula: "Must + be + Inspected (V3)", func: "Mandatory check." }
+                        ]
+                    }
+                ],
+                vocabList: [{ word: "Pressure Drop", pos: "Compound Noun", meaning: "Pressure loss", synonyms: "Depressurization" }]
+            },
+            pneumatic: {
+                code: "ERR-PNE-04", sensorName: "Pneumatic Air Supply (Bar)", shortMetric: "Air Pressure", unit: "Bar", normalBase: 6.8, faultSpike: 1.4,
+                localSop: "<strong>Bahasa Bengkel:</strong> Angin kompresor bocor.<br><strong>SOP:</strong> Cek selang PU dan regulator angin.",
+                variations: [
+                    {
+                        label: "V1: HMI", englishText: "ALARM: Compressed Air Pressure Was Lost in Pneumatic Cylinder.",
+                        translation: "Alarm: Tekanan Udara Kompresor Hilang pada Silinder Pneumatik.",
+                        formulaDesc: "[Noun] + [Compound Noun] + [Past Passive: Was + V3] + [Prep Phrase]",
+                        fullBreakdown: [
+                            { word: "Compressed Air Pressure", pos: "Compound Noun", formula: "Participle Adj + Noun", func: "Pneumatic supply pressure." },
+                            { word: "Was Lost", pos: "Past Passive", formula: "Was + Lost (V3)", func: "Pressure dropped to zero." },
+                            { word: "in Pneumatic Cylinder", pos: "Prep Phrase", formula: "Prep + Compound Noun", func: "Air piston actuator." }
+                        ]
+                    },
+                    {
+                        label: "V2: Manual", englishText: "FAULT: Pneumatic Supply Line Has Been Depressurized Due to Air Leakage.",
+                        translation: "Kesalahan: Jalur Suplai Pneumatik Kehilangan Tekanan Akibat Kebocoran Udara.",
+                        formulaDesc: "[Compound Noun] + [Present Perfect Passive] + [Due to + Noun]",
+                        fullBreakdown: [
+                            { word: "Pneumatic Supply Line", pos: "Compound Noun", formula: "Adj + Noun + Noun", func: "Air tubing line." },
+                            { word: "Has Been Depressurized", pos: "Present Perfect Passive", formula: "Has + been + V3", func: "Lost air pressure." },
+                            { word: "Due to Air Leakage", pos: "Prep Phrase", formula: "Due to + Noun", func: "Caused by leaking hose." }
+                        ]
+                    },
+                    {
+                        label: "V3: SOP", englishText: "WARNING: Inadequate Air Pressure is Detected at Solenoid Valve.",
+                        translation: "Peringatan: Tekanan Udara Tidak Memadai Terdeteksi di Katup Solenoid.",
+                        formulaDesc: "[Noun] + [Adj + Noun] + [Present Passive] + [Prep Phrase]",
+                        fullBreakdown: [
+                            { word: "Inadequate Air Pressure", pos: "Compound Noun", formula: "Prefix In- + Adj + Noun", func: "Insufficient air supply." },
+                            { word: "is Detected", pos: "Present Passive", formula: "Is + Detected (V3)", func: "Sensed by switch." },
+                            { word: "at Solenoid Valve", pos: "Prep Phrase", formula: "Prep + Compound Noun", func: "Electromagnetic air valve." }
+                        ]
+                    }
+                ],
+                vocabList: [{ word: "Compressed Air", pos: "Compound Noun", meaning: "Pressurized air", synonyms: "Pneumatic Supply" }]
+            },
+            jamming: {
+                code: "ERR-MEC-05", sensorName: "Motor Torque Load (%)", shortMetric: "Motor Torque", unit: "%", normalBase: 48, faultSpike: 148,
+                localSop: "<strong>Bahasa Bengkel:</strong> Konveyor macet nyangkut.<br><strong>SOP:</strong> Matikan mesin, bersihkan ganjalan.",
+                variations: [
+                    {
+                        label: "V1: HMI", englishText: "ALERT: Secondary Conveyor Belt Has Been Stopped Due to Mechanical Jamming.",
+                        translation: "Peringatan: Sabuk Konveyor Sekunder Telah Dihentikan Karena Kemacetan Mekanis.",
+                        formulaDesc: "[Compound Noun] + [Present Perfect Passive: Has + Been + V3] + [Prep Phrase]",
+                        fullBreakdown: [
+                            { word: "Secondary Conveyor Belt", pos: "Compound Noun", formula: "Adj + Noun + Noun", func: "Belt transfer line." },
+                            { word: "Has Been Stopped", pos: "Present Perfect Passive", formula: "Has + been + Stopped (V3)", func: "Halted by overload relay." },
+                            { word: "Due to Mechanical Jamming", pos: "Prep Phrase", formula: "Due to + Adj + Gerund", func: "Caused by jammed part." }
+                        ]
+                    },
+                    {
+                        label: "V2: Manual", englishText: "FAULT: Drive Roller Rotation is Obstructed by Foreign Object.",
+                        translation: "Kesalahan: Putaran Rol Penggerak Terhalang oleh Benda Asing.",
+                        formulaDesc: "[Compound Noun] + [Present Passive: Is + V3] + [by + Agent]",
+                        fullBreakdown: [
+                            { word: "Drive Roller Rotation", pos: "Compound Noun", formula: "Noun + Noun + Noun", func: "Roller spinning motion." },
+                            { word: "is Obstructed", pos: "Present Passive", formula: "Is + Obstructed (V3)", func: "Blocked physically." },
+                            { word: "by Foreign Object", pos: "Agent Phrase", formula: "By + Adj + Noun", func: "External debris or scrap." }
+                        ]
+                    },
+                    {
+                        label: "V3: SOP", englishText: "DANGER: Severe Torque Overload Was Triggered by Seized Mechanism.",
+                        translation: "Bahaya: Beban Torsi Berlebih Dipicu oleh Mekanisme yang Macet.",
+                        formulaDesc: "[Compound Noun] + [Past Passive: Was + V3] + [by + Agent]",
+                        fullBreakdown: [
+                            { word: "Severe Torque Overload", pos: "Compound Noun", formula: "Adj + Noun + Noun", func: "Excessive motor load." },
+                            { word: "Was Triggered", pos: "Past Passive", formula: "Was + Triggered (V3)", func: "Activated trip alarm." },
+                            { word: "by Seized Mechanism", pos: "Agent Phrase", formula: "By + Participle Adj + Noun", func: "Locked mechanical part." }
+                        ]
+                    }
+                ],
+                vocabList: [{ word: "Mechanical Jamming", pos: "Adj + Gerund", meaning: "Physical blockage", synonyms: "Obstruction, Seizure" }]
+            },
+            vibration: {
+                code: "ERR-VIB-06", sensorName: "Spindle Vibration (mm/s)", shortMetric: "Vibration", unit: "mm/s", normalBase: 1.6, faultSpike: 14.5,
+                localSop: "<strong>Bahasa Bengkel:</strong> Laher spindel oblak.<br><strong>SOP:</strong> Ganti <em>bearing</em> baru.",
+                variations: [
+                    {
+                        label: "V1: HMI", englishText: "DANGER: Excessive Vibration is Detected. Replace Worn Spindle Bearing Immediately.",
+                        translation: "Bahaya: Getaran Berlebih Terdeteksi. Segera Ganti Laher Spindel yang Aus.",
+                        formulaDesc: "[Adj + Noun + Present Passive] + [Imperative: Verb-1 + Object + Adverb]",
+                        fullBreakdown: [
+                            { word: "Excessive Vibration", pos: "Adj + Noun", formula: "Noun Phrase", func: "High shaking velocity." },
+                            { word: "is Detected", pos: "Present Passive", formula: "Is + Detected (V3)", func: "Read by accelerometer." },
+                            { word: "Replace Worn Spindle Bearing", pos: "Imperative Phrase", formula: "Verb-1 + Participle Adj + Noun", func: "Direct replacement command." },
+                            { word: "Immediately", pos: "Adverb", formula: "Adverb of Time", func: "Without delay." }
+                        ]
+                    },
+                    {
+                        label: "V2: Manual", englishText: "WARNING: Abnormal Oscillation Has Been Induced by Degraded Ball Bearing.",
+                        translation: "Peringatan: Getaran Tidak Normal Telah Dipicu oleh Laher yang Aus.",
+                        formulaDesc: "[Adj + Noun] + [Present Perfect Passive] + [by + Agent]",
+                        fullBreakdown: [
+                            { word: "Abnormal Oscillation", pos: "Adj + Noun", formula: "Noun Phrase", func: "Unstable vibration." },
+                            { word: "Has Been Induced", pos: "Present Perfect Passive", formula: "Has + been + Induced (V3)", func: "Caused or generated." },
+                            { word: "by Degraded Ball Bearing", pos: "Agent Phrase", formula: "By + Adj + Compound Noun", func: "Worn out bearing." }
+                        ]
+                    },
+                    {
+                        label: "V3: SOP", englishText: "FAULT: High Vibration Amplitude is Sensed. Damaged Bearing Must Be Replaced.",
+                        translation: "Kesalahan: Amplitudo Getaran Tinggi Terbaca. Laher Rusak Harus Diganti.",
+                        formulaDesc: "[Compound Noun + Present Passive] + [Modal Passive: Must + Be + V3]",
+                        fullBreakdown: [
+                            { word: "High Vibration Amplitude", pos: "Compound Noun", formula: "Adj + Noun + Noun", func: "Vibration wave peak." },
+                            { word: "is Sensed", pos: "Present Passive", formula: "Is + Sensed (V3)", func: "Detected by probe." },
+                            { word: "Damaged Bearing Must Be Replaced", pos: "Modal Passive", formula: "Subject + Must + be + V3", func: "Mandatory bearing change." }
+                        ]
+                    }
+                ],
+                vocabList: [{ word: "Worn Bearing", pos: "Adj + Noun", meaning: "Damaged rotary bearing", synonyms: "Degraded Bearing" }]
+            },
+            coolant: {
+                code: "ERR-CLN-07", sensorName: "Coolant Flow Rate (L/m)", shortMetric: "Coolant Flow", unit: "L/m", normalBase: 32.0, faultSpike: 4.5,
+                localSop: "<strong>Bahasa Bengkel:</strong> Air coolant mampet.<br><strong>SOP:</strong> Bersihkan saringan filter.",
+                variations: [
+                    {
+                        label: "V1: HMI", englishText: "CAUTION: Coolant Flow is Restricted by Clogged Filter. Cooling Pump is Being Shut Down.",
+                        translation: "Perhatian: Aliran Pendingin Terhambat Filter Mampet. Pompa Sedang Dimatikan.",
+                        formulaDesc: "[Present Passive + by Agent] + [Present Continuous Passive: Is + Being + V3]",
+                        fullBreakdown: [
+                            { word: "Coolant Flow", pos: "Compound Noun", formula: "Noun + Noun", func: "Cooling liquid stream." },
+                            { word: "is Restricted by Clogged Filter", pos: "Present Passive", formula: "Is + V3 + by + Adj + Noun", func: "Blocked by dirty strainer." },
+                            { word: "is Being Shut Down", pos: "Continuous Passive", formula: "Is + being + Shut down (V3)", func: "Pump stopping in progress." }
+                        ]
+                    },
+                    {
+                        label: "V2: Manual", englishText: "WARNING: Cooling Liquid Circulation Has Been Blocked in Heat Exchanger.",
+                        translation: "Peringatan: Sirkulasi Cairan Pendingin Telah Tersumbat di Radiator.",
+                        formulaDesc: "[Compound Noun] + [Present Perfect Passive] + [Prep Phrase]",
+                        fullBreakdown: [
+                            { word: "Cooling Liquid Circulation", pos: "Compound Noun", formula: "Noun Phrase", func: "Coolant loop flow." },
+                            { word: "Has Been Blocked", pos: "Present Perfect Passive", formula: "Has + been + Blocked (V3)", func: "Obstructed flow." },
+                            { word: "in Heat Exchanger", pos: "Prep Phrase", formula: "Prep + Compound Noun", func: "Radiator cooling unit." }
+                        ]
+                    },
+                    {
+                        label: "V3: SOP", englishText: "FAULT: Low Coolant Discharge is Detected. Strainer Mesh Must Be Cleaned.",
+                        translation: "Kesalahan: Debit Pendingin Rendah Terdeteksi. Kasa Filter Harus Dibersihkan.",
+                        formulaDesc: "[Compound Noun + Present Passive] + [Modal Passive: Must + Be + V3]",
+                        fullBreakdown: [
+                            { word: "Low Coolant Discharge", pos: "Compound Noun", formula: "Adj + Noun + Noun", func: "Low pump output." },
+                            { word: "is Detected", pos: "Present Passive", formula: "Is + Detected (V3)", func: "Read by flowmeter." },
+                            { word: "Strainer Mesh Must Be Cleaned", pos: "Modal Passive", formula: "Subject + Must + be + V3", func: "Mandatory filter cleaning." }
+                        ]
+                    }
+                ],
+                vocabList: [{ word: "Clogged Filter", pos: "Adj + Noun", meaning: "Blocked strainer", synonyms: "Fouled Mesh" }]
+            },
+            misalignment: {
+                code: "ERR-ALN-08", sensorName: "Coupling Deviation (mm)", shortMetric: "Misalignment", unit: "mm", normalBase: 0.02, faultSpike: 0.48,
+                localSop: "<strong>Bahasa Bengkel:</strong> Kopling motor tidak senter.<br><strong>SOP:</strong> Setel ulang kelurusan poros.",
+                variations: [
+                    {
+                        label: "V1: HMI", englishText: "FAULT: Severe Angular Misalignment is Detected on Motor Coupling. Drive Shaft Should Be Realigned.",
+                        translation: "Kesalahan: Ketidaksejajaran Sudut Terdeteksi di Kopling Motor. Poros Harus Disenter Ulang.",
+                        formulaDesc: "[Compound Noun + Present Passive] + [Modal Passive: Should + Be + V3]",
+                        fullBreakdown: [
+                            { word: "Severe Angular Misalignment", pos: "Compound Noun", formula: "Adj + Adj + Noun (Prefix Mis-)", func: " crooked shaft angle." },
+                            { word: "is Detected", pos: "Present Passive", formula: "Is + Detected (V3)", func: "Sensed by proximity probe." },
+                            { word: "Drive Shaft Should Be Realigned", pos: "Modal Passive", formula: "Should + be + Realigned (V3)", func: "Recommended alignment SOP." }
+                        ]
+                    },
+                    {
+                        label: "V2: Manual", englishText: "WARNING: Excessive Shaft Runout Has Been Measured at Flexible Coupling.",
+                        translation: "Peringatan: Keolengan Poros Berlebih Telah Terukur pada Kopling Fleksibel.",
+                        formulaDesc: "[Compound Noun] + [Present Perfect Passive] + [Prep Phrase]",
+                        fullBreakdown: [
+                            { word: "Excessive Shaft Runout", pos: "Compound Noun", formula: "Adj + Noun + Noun", func: "Eccentric shaft rotation." },
+                            { word: "Has Been Measured", pos: "Present Perfect Passive", formula: "Has + been + Measured (V3)", func: "Recorded by dial gauge." },
+                            { word: "at Flexible Coupling", pos: "Prep Phrase", formula: "Prep + Compound Noun", func: "Shaft joint location." }
+                        ]
+                    },
+                    {
+                        label: "V3: SOP", englishText: "ALARM: Coupling Offset Exceeds Tolerance Limit. Laser Alignment Must Be Performed.",
+                        translation: "Alarm: Pergeseran Kopling Melebihi Batas Toleransi. Penyejajaran Laser Harus Dilakukan.",
+                        formulaDesc: "[Compound Noun + Active Verb] + [Modal Passive: Must + Be + V3]",
+                        fullBreakdown: [
+                            { word: "Coupling Offset", pos: "Compound Noun", formula: "Noun + Noun", func: "Parallel shaft deviation." },
+                            { word: "Exceeds Tolerance Limit", pos: "Active Verb + Noun", formula: "Verb-s + Compound Noun", func: "Goes beyond safe spec." },
+                            { word: "Laser Alignment Must Be Performed", pos: "Modal Passive", formula: "Must + be + Performed (V3)", func: "Mandatory calibration." }
+                        ]
+                    }
+                ],
+                vocabList: [{ word: "Angular Misalignment", pos: "Compound Noun", meaning: "Uncentered shaft angle", synonyms: "Shaft Runout, Offset" }]
+            }
+        };
+
+        let currentScenarioKey = null, currentVariationIndex = 0, isSimulationRunning = false, chartInstance = null;
+        let quizScore = 0, selectedQuizWords = [], currentQuizWords = [];
+
+        function ensureChartReady() {
+            if (chartInstance) return;
+            if (typeof Chart === 'undefined') return;
+            const canvasEl = document.getElementById('telemetryChart');
+            if (!canvasEl) return;
+            chartInstance = new Chart(canvasEl.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 15}, (_, i) => `-${15-i}s`),
+                    datasets: [{ data: Array.from({length: 15}, () => 55), borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.15)', borderWidth: 2.5, fill: true, tension: 0.35 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+        }
+
+        setInterval(() => {
+            if (!chartInstance || !currentScenarioKey) return;
+            const sc = faultDatabase[currentScenarioKey], arr = chartInstance.data.datasets[0].data;
+            arr.shift();
+            const targetVal = isSimulationRunning ? sc.faultSpike : sc.normalBase;
+            const noise = (Math.random() - 0.5) * (targetVal * 0.03);
+            arr.push(+(targetVal + noise).toFixed(1));
+            chartInstance.update('none');
+            document.getElementById('telemetry-live-val').textContent = `${sc.shortMetric}: ${+(targetVal + noise).toFixed(1)} ${sc.unit}`;
+        }, 1200);
+
+        function selectScenario(key) {
+            currentScenarioKey = key;
+            currentVariationIndex = 0;
+            isSimulationRunning = false;
+
+            document.getElementById('standby-screen').classList.add('hidden');
+            const ws = document.getElementById('active-workspace');
+            ws.classList.remove('hidden');
+            ws.classList.add('flex');
+
+            document.querySelectorAll('.fault-btn').forEach(b => b.classList.remove('ring-2', 'ring-amber-400', 'bg-gray-800'));
+            const activeBtn = document.getElementById(`btn-${key}`);
+            if (activeBtn) activeBtn.classList.add('ring-2', 'ring-amber-400', 'bg-gray-800');
+
+            resetFailureSimulation();
+            renderContent();
+            setupQuizForCurrentScenario();
+            openModule('fullBreakdown');
+        }
+
+        function startFailureSimulation() {
+            if (!currentScenarioKey) return;
+            isSimulationRunning = true;
+            const sc = faultDatabase[currentScenarioKey];
+            document.getElementById('system-status-badge').className = "flex items-center space-x-2 bg-red-500/20 border border-red-500/50 text-red-400 px-3 py-1.5 rounded-full text-xs font-mono-tech font-semibold";
+            document.getElementById('status-text').textContent = `FAULT DETECTED // ${sc.code}`;
+            document.getElementById('sim-status-indicator').textContent = "STATUS: CRITICAL FAULT SIMULATION ACTIVE!";
+            document.getElementById('sim-status-indicator').className = "text-xs font-mono-tech font-bold text-red-400 blink-warning";
+            ensureChartReady();
+            if (chartInstance) {
+                chartInstance.data.datasets[0].borderColor = '#ef4444';
+                chartInstance.data.datasets[0].backgroundColor = 'rgba(239, 68, 68, 0.15)';
+                chartInstance.update();
+            }
+        }
+
+        function resetFailureSimulation() {
+            if (!currentScenarioKey) return;
+            isSimulationRunning = false;
+            const sc = faultDatabase[currentScenarioKey];
+            document.getElementById('system-status-badge').className = "flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 px-3 py-1.5 rounded-full text-xs font-mono-tech font-semibold";
+            document.getElementById('status-text').textContent = `SYSTEM NORMAL // ${sc.code}`;
+            document.getElementById('sim-status-indicator').textContent = "STATUS: NORMAL RUNNING (Click 'Start Failure' to project fault)";
+            document.getElementById('sim-status-indicator').className = "text-xs font-mono-tech font-bold text-emerald-400";
+            if (chartInstance) {
+                chartInstance.data.datasets[0].borderColor = '#10b981';
+                chartInstance.data.datasets[0].backgroundColor = 'rgba(16, 185, 129, 0.15)';
+                chartInstance.data.datasets[0].data = Array.from({length: 15}, () => sc.normalBase);
+                chartInstance.update();
+            }
+        }
+
+        function switchVariation(idx) {
+            currentVariationIndex = idx;
+            renderContent();
+        }
+
+        function renderContent() {
+            if (!currentScenarioKey) return;
+            const sc = faultDatabase[currentScenarioKey], v = sc.variations[currentVariationIndex];
+            document.querySelectorAll('.var-btn').forEach((b, i) => {
+                b.className = `var-btn text-xs px-2.5 py-1 rounded font-mono-tech font-semibold ${i === currentVariationIndex ? 'bg-amber-500 text-gray-950 font-bold' : 'text-gray-300 hover:bg-gray-800'}`;
+            });
+            document.getElementById('fault-code-id').textContent = `FAULT CODE: ${sc.code}`;
+            document.getElementById('var-style-badge').textContent = v.label;
+            document.getElementById('fault-english-text').textContent = v.englishText;
+            document.getElementById('trans-technical').textContent = v.translation;
+            document.getElementById('trans-local-sop').innerHTML = sc.localSop;
+            document.getElementById('sentence-formula-desc').textContent = v.formulaDesc;
+
+            document.getElementById('pos-sentence-view').innerHTML = v.fullBreakdown.map(fb => `
+                <div class="flex flex-col items-center p-2 rounded-lg bg-industrial-900 border border-gray-800">
+                    <span class="text-xs font-mono-tech font-bold text-white mb-1">${fb.word}</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded border border-amber-500/40 bg-amber-500/10 text-amber-300 font-semibold">${fb.pos}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('full-breakdown-tbody').innerHTML = v.fullBreakdown.map(fb => `
+                <tr class="hover:bg-gray-800/60">
+                    <td class="py-2.5 px-3 font-mono-tech font-bold text-white">${fb.word}</td>
+                    <td class="py-2.5 px-3 text-amber-300">${fb.pos}</td>
+                    <td class="py-2.5 px-3 font-mono-tech text-blue-300">${fb.formula}</td>
+                    <td class="py-2.5 px-3 text-gray-300">${fb.func}</td>
+                    <td class="py-2.5 px-3 text-center">
+                        <button type="button" onclick="speakText('${fb.word.replace(/'/g, "")}')" class="text-amber-400 hover:text-amber-300 bg-amber-500/10 p-1.5 rounded"><i class="fa-solid fa-volume-low"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+
+            document.getElementById('vocab-table-body').innerHTML = sc.vocabList.map(w => `
+                <tr class="border-b border-gray-800">
+                    <td class="py-2 px-3 font-bold text-white">${w.word}</td>
+                    <td class="py-2 px-3 text-amber-300">${w.pos}</td>
+                    <td class="py-2 px-3 text-gray-300">${w.meaning}</td>
+                    <td class="py-2 px-3 text-emerald-400">${w.synonyms}</td>
+                    <td class="py-2 px-3 text-center"><button type="button" onclick="speakText('${w.word}')" class="text-amber-400"><i class="fa-solid fa-volume-low"></i></button></td>
+                </tr>
+            `).join('');
+
+            document.getElementById('all-variations-list').innerHTML = sc.variations.map((x, i) => `
+                <div onclick="switchVariation(${i})" class="p-2 rounded cursor-pointer border ${i === currentVariationIndex ? 'bg-amber-500/10 border-amber-500' : 'bg-industrial-800 border-gray-700'}">
+                    <span class="font-bold text-amber-400 mr-2">${x.label}:</span>${x.englishText}
+                </div>
+            `).join('');
+
+            document.getElementById('chart-subtitle').textContent = `Sensor Chart: ${sc.sensorName}`;
+            document.getElementById('telemetry-live-val').textContent = `${sc.shortMetric}: ${isSimulationRunning ? sc.faultSpike : sc.normalBase} ${sc.unit}`;
+        }
+
+        function setupQuizForCurrentScenario() {
+            if (!currentScenarioKey) return;
+            const v = faultDatabase[currentScenarioKey].variations[0];
+            document.getElementById('quiz-target-meaning').textContent = `Target Meaning: "${v.translation}"`;
+            document.getElementById('quiz-grammar-hint').textContent = `Formula Hint: ${v.formulaDesc}`;
+            currentQuizWords = v.englishText.replace(/[.:]/g, '').split(' ');
+            selectedQuizWords = [];
+            updateQuizUI();
+        }
+
+        function updateQuizUI() {
+            const dropzone = document.getElementById('quiz-answer-dropzone');
+            const wordBank = document.getElementById('quiz-word-bank');
+            if (selectedQuizWords.length === 0) {
+                dropzone.innerHTML = `<span class="text-xs text-gray-500 italic">Click word blocks below in the correct order to build the alarm sentence...</span>`;
+            } else {
+                dropzone.innerHTML = selectedQuizWords.map((item, idx) => `
+                    <button type="button" onclick="removeQuizWord(${idx})" class="bg-amber-500 text-gray-950 font-bold font-mono-tech text-xs px-2.5 py-1.5 rounded flex items-center gap-1">
+                        ${item.word} <i class="fa-solid fa-xmark text-[10px]"></i>
+                    </button>
+                `).join('');
+            }
+            const available = currentQuizWords.map((w, i) => ({word: w, id: i})).filter(item => !selectedQuizWords.some(s => s.id === item.id));
+            wordBank.innerHTML = available.map(item => `
+                <button type="button" onclick="addQuizWord('${item.word.replace(/'/g, "")}', ${item.id})" class="bg-industrial-900 hover:bg-gray-700 text-gray-200 border border-gray-700 font-mono-tech text-xs px-3 py-1.5 rounded">
+                    ${item.word}
+                </button>
+            `).join('');
+            document.getElementById('quiz-score-display').textContent = `Score: ${quizScore}`;
+        }
+
+        function addQuizWord(word, id) { selectedQuizWords.push({word, id}); updateQuizUI(); }
+        function removeQuizWord(index) { selectedQuizWords.splice(index, 1); updateQuizUI(); }
+        function clearQuizSelection() { selectedQuizWords = []; updateQuizUI(); document.getElementById('quiz-feedback-msg').textContent = ""; }
+
+        function checkQuizAnswer() {
+            if (!currentScenarioKey) return;
+            const targetString = faultDatabase[currentScenarioKey].variations[0].englishText.replace(/[.:]/g, '').split(' ').join(' ');
+            const userString = selectedQuizWords.map(s => s.word).join(' ');
+            const fb = document.getElementById('quiz-feedback-msg');
+            if (userString === targetString) {
+                fb.textContent = "CORRECT! Excellent Technical English!";
+                fb.className = "text-xs font-bold text-emerald-400";
+                quizScore += 10;
+                updateQuizUI();
+                speakText(targetString);
+            } else {
+                fb.textContent = "Incorrect word order. Try again!";
+                fb.className = "text-xs font-bold text-red-400";
+            }
+        }
+
+        function nextQuizQuestion() {
+            const keys = Object.keys(faultDatabase);
+            selectScenario(keys[(keys.indexOf(currentScenarioKey) + 1) % keys.length]);
+            openModule('practice');
+            document.getElementById('quiz-feedback-msg').textContent = "";
+        }
+
+        function openModule(name) {
+            document.querySelectorAll('.mod-panel').forEach(p => p.classList.add('hidden'));
+            const panel = document.getElementById(`panel-${name}`);
+            if (panel) panel.classList.remove('hidden');
+
+            document.querySelectorAll('.mod-tab').forEach(t => t.classList.remove('ring-2', 'ring-amber-400'));
+            const activeTab = document.getElementById(`tab-${name}`);
+            if (activeTab) activeTab.classList.add('ring-2', 'ring-amber-400');
+
+            if (name === 'telemetry') {
+                ensureChartReady();
+                if (chartInstance) setTimeout(() => chartInstance.resize(), 50);
+            }
+        }
+
+        function closeModules() {
+            document.querySelectorAll('.mod-panel').forEach(p => p.classList.add('hidden'));
+        }
+
+        function resetToStandby() {
+            currentScenarioKey = null;
+            isSimulationRunning = false;
+            closeModules();
+            document.getElementById('active-workspace').classList.add('hidden');
+            document.getElementById('active-workspace').classList.remove('flex');
+            document.getElementById('standby-screen').classList.remove('hidden');
+            document.querySelectorAll('.fault-btn').forEach(b => b.classList.remove('ring-2', 'ring-amber-400', 'bg-gray-800'));
+            document.getElementById('system-status-badge').className = "flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 px-3 py-1.5 rounded-full text-xs font-mono-tech font-semibold";
+            document.getElementById('status-text').textContent = "SYSTEM STANDBY // NORMAL";
+        }
+
+        function speakText(txt) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                window.speechSynthesis.speak(new SpeechSynthesisUtterance(txt));
+            }
+        }
+        function speakCurrentFault() {
+            if (currentScenarioKey) speakText(faultDatabase[currentScenarioKey].variations[currentVariationIndex].englishText);
+        }
+    </script>
+</body>
+</html>
